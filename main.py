@@ -1,5 +1,5 @@
-from glob import glob
-from re import A
+from asyncio.windows_events import NULL
+from jinja2 import Undefined
 import pygame
 from sys import exit
 from random import randint
@@ -7,10 +7,9 @@ from random import randint
 class Snake(pygame.sprite.Sprite):
   def __init__(self):
     super().__init__()
-    self.length = 3
-    self.headPosition = (10, 10)
-    self.tailTab = [(10,11),(10,12)]
-    self.endOfTailLastPosition = (10,12)
+    self.headPosition = (NUM_OF_COL//2, NUM_OF_ROW//2)
+    self.tailTab = []
+    self.endOfTailLastPosition = (NUM_OF_COL//2, NUM_OF_ROW//2)
     self.direction = 'up'
     self.speedCap = 5
     self.speedCount = 0
@@ -59,8 +58,8 @@ class Snake(pygame.sprite.Sprite):
 class Apple(pygame.sprite.Sprite):
   def __init__(self):
     super().__init__()
-    self.position = (5,5)
-    self.isEatten = False
+    self.position = (_, _)
+    self.isEatten = True
   
   def update(self):
     if self.isEatten:
@@ -88,7 +87,7 @@ PLAY_SURFACE_HEIGHT = 600
 NUM_OF_COL = 20
 NUM_OF_ROW = 20
 
-CURRENT_SCORE = 0
+CURRENT_SCORE = Undefined
 
 GAME_MATRIX = []
 for _ in range(NUM_OF_COL + 1):
@@ -182,16 +181,16 @@ def eatManager(snake, apple):
     apple.isEatten = True
     snake.grow()
     CURRENT_SCORE += 1
-    print('apple Eatten')
 
 def printScore():
   scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
-  WINDOW.blit(scoreTxt, (WINTDOW_WIDTH/2 - 10, 1))
+  scoreRect = scoreTxt.get_rect(center = (WINTDOW_WIDTH / 2, 25))
+  WINDOW.blit(scoreTxt, scoreRect)
 
 snake = Snake()
 apple = Apple()
 
-gameActive = True
+gameActive = False
 
 while True:
   for event in pygame.event.get():
@@ -209,11 +208,29 @@ while True:
 
     snake.update()
     apple.update()
-    print(snake.headPosition)
   else:
     WINDOW.fill((121, 144, 147))
-    gameOverTxt = font.render('Game Over', True, (255, 0, 0))
-    WINDOW.blit(gameOverTxt, (10,10))
+
+    
+    nameTxt = font.render('py-snake', True, (0, 0, 0))
+    nameRect = nameTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 - 100))
+    WINDOW.blit(nameTxt, nameRect)
+
+    startTxt = font.render('Press Enter to start', True, (0, 0, 0))
+    startRect = startTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 + 100))
+    WINDOW.blit(startTxt, startRect)
+
+    if CURRENT_SCORE != Undefined:
+      overScoreTxt = font.render(f'Your score: {CURRENT_SCORE}', True, (0, 0, 0))
+      overScoreRect = overScoreTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2))
+      WINDOW.blit(overScoreTxt, overScoreRect)
+
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_RETURN]:
+      gameActive = True
+      snake = Snake()
+      apple = Apple()
+      CURRENT_SCORE = 0
 
   pygame.display.update()
   clock.tick(60)
