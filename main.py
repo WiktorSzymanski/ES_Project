@@ -10,6 +10,7 @@ class Snake(pygame.sprite.Sprite):
     self.length = 3
     self.headPosition = (10, 10)
     self.tailTab = [(10,11),(10,12)]
+    self.endOfTailLastPosition = (10,12)
     self.direction = 'up'
 
   def update(self):
@@ -18,7 +19,7 @@ class Snake(pygame.sprite.Sprite):
 
   def move(self):
     self.tailTab.insert(0,self.headPosition)
-    self.tailTab.pop()
+    self.endOfTailLastPosition = self.tailTab.pop()
 
     if self.direction == 'left':
       self.headPosition = (self.headPosition[0] - 1, self.headPosition[1])
@@ -31,6 +32,9 @@ class Snake(pygame.sprite.Sprite):
     
     if self.direction == 'down':
       self.headPosition = (self.headPosition[0], self.headPosition[1] + 1)
+
+  def grow(self):
+    self.tailTab.append(self.endOfTailLastPosition)
 
   def playerInput(self):
     keys = pygame.key.get_pressed()
@@ -49,7 +53,7 @@ class Snake(pygame.sprite.Sprite):
 class Apple(pygame.sprite.Sprite):
   def __init__(self):
     super().__init__()
-    self.position = (0,0)
+    self.position = (5,5)
     self.isEatten = False
   
   def update(self):
@@ -70,13 +74,15 @@ clock = pygame.time.Clock()
 font = pygame.font.Font(None, 50)
 
 WINTDOW_WIDTH = 700
-WINDOW_HEIGHT = 800
+WINDOW_HEIGHT = 700
 
 PLAY_SURFACE_WIDTH = 600
 PLAY_SURFACE_HEIGHT = 600
 
 NUM_OF_COL = 20
 NUM_OF_ROW = 20
+
+CURRENT_SCORE = 0
 
 GAME_MATRIX = []
 for _ in range(NUM_OF_COL + 1):
@@ -155,18 +161,26 @@ def drawPlaySurface(numOfCol, numOfRow, snake, apple):
   WINDOW.blit(playSurface, (50, 50))
 
 def gameOverCondition(snake):
-  if (snake.headPosition[0] < 0 or
-      snake.headPosition[1] < 0 or
+  if (snake.headPosition[0] <= -1 or
+      snake.headPosition[1] <= -1 or
       snake.headPosition[0] >= NUM_OF_ROW or
-      snake.headPosition[1] >= NUM_OF_COL):
+      snake.headPosition[1] >= NUM_OF_COL or
+      snake.headPosition in snake.tailTab):
     return False
   return True
 
 def eatManager(snake, apple):
+  global CURRENT_SCORE
+
   if snake.headPosition == apple.position:
     apple.isEatten = True
-    
+    snake.grow()
+    CURRENT_SCORE += 1
     print('apple Eatten')
+
+def printScore():
+  scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
+  WINDOW.blit(scoreTxt, (WINTDOW_WIDTH/2 - 10, 1))
 
 snake = Snake()
 apple = Apple()
@@ -182,6 +196,7 @@ while True:
 
   if gameActive:
     drawBackground()
+    printScore()
     drawPlaySurface(NUM_OF_COL, NUM_OF_ROW, snake, apple)
     eatManager(snake, apple)
 
