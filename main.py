@@ -12,10 +12,16 @@ class Snake(pygame.sprite.Sprite):
     self.tailTab = [(10,11),(10,12)]
     self.endOfTailLastPosition = (10,12)
     self.direction = 'up'
+    self.speedCap = 5
+    self.speedCount = 0
 
   def update(self):
     self.playerInput()
-    self.move()
+
+    if self.speedCount % self.speedCap == 0:
+      self.move()
+
+    self.speedCount += 1
 
   def move(self):
     self.tailTab.insert(0,self.headPosition)
@@ -41,13 +47,13 @@ class Snake(pygame.sprite.Sprite):
     if keys[pygame.K_UP] and self.direction != 'down':
       self.direction = 'up'
 
-    if keys[pygame.K_DOWN] and self.direction != 'up':
+    elif keys[pygame.K_DOWN] and self.direction != 'up':
       self.direction = 'down'
 
-    if keys[pygame.K_LEFT] and self.direction != 'right':
+    elif keys[pygame.K_LEFT] and self.direction != 'right':
       self.direction = 'left'
 
-    if keys[pygame.K_RIGHT] and self.direction != 'left':
+    elif keys[pygame.K_RIGHT] and self.direction != 'left':
       self.direction = 'right'
 
 class Apple(pygame.sprite.Sprite):
@@ -193,7 +199,6 @@ while True:
       pygame.quit()
       exit()
 
-
   if gameActive:
     drawBackground()
     printScore()
@@ -211,4 +216,4 @@ while True:
     WINDOW.blit(gameOverTxt, (10,10))
 
   pygame.display.update()
-  clock.tick(10)
+  clock.tick(60)
