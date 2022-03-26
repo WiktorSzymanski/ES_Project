@@ -1,4 +1,3 @@
-from asyncio.windows_events import NULL
 from jinja2 import Undefined
 import pygame
 from sys import exit
@@ -7,36 +6,63 @@ from random import randint
 class Snake(pygame.sprite.Sprite):
   def __init__(self):
     super().__init__()
-    self.headPosition = (NUM_OF_COL//2, NUM_OF_ROW//2)
-    self.tailTab = []
-    self.endOfTailLastPosition = (NUM_OF_COL//2, NUM_OF_ROW//2)
+    self.headPosition = pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2)
+    self.tailTab = [pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 1),pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 2)]
+
+    self.endOfTailLastPosition = pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2)
     self.direction = 'up'
-    self.speedCap = 5
-    self.speedCount = 0
+    self.newDirection = 'up'
+    self.snakeScale = (TILE_WIDTH / 40)
+
+    self.snakeHeadImg = pygame.image.load('./graphics/head.png').convert_alpha()
+    self.snakeHeadImg = pygame.transform.rotozoom(self.snakeHeadImg, 0, self.snakeScale)
+    self.snakeHeadImgTab = [self.snakeHeadImg, pygame.transform.rotate(self.snakeHeadImg, 270), pygame.transform.rotate(self.snakeHeadImg, 180), pygame.transform.rotate(self.snakeHeadImg, 90)]
+
+    self.snakeBodyImg = pygame.image.load('./graphics/body.png').convert_alpha()
+    self.snakeBodyImg = pygame.transform.rotozoom(self.snakeBodyImg, 0, self.snakeScale)
+    self.snakeBodyImgTab = [self.snakeBodyImg, pygame.transform.rotate(self.snakeBodyImg, 270), pygame.transform.rotate(self.snakeBodyImg, 180), pygame.transform.rotate(self.snakeBodyImg, 90)]
+
+    self.snakeTurnImg = pygame.image.load('./graphics/turn.png').convert_alpha()
+    self.snakeTurnImg = pygame.transform.rotozoom(self.snakeTurnImg, 0, self.snakeScale)
+    self.snakeTurnImgTab = [self.snakeTurnImg, pygame.transform.rotate(self.snakeTurnImg, 270), pygame.transform.rotate(self.snakeTurnImg, 180), pygame.transform.rotate(self.snakeTurnImg, 90)]
+
 
   def update(self):
-    self.playerInput()
+    self.drawSnake()
+    self.playerInput()    
 
-    if self.speedCount % self.speedCap == 0:
-      self.move()
+  def drawSnake(self):
+    snakeHeadRect = self.snakeHeadImg.get_rect(center = (self.headPosition[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.headPosition[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
+    WINDOW.blit(self.snakeHeadImg, snakeHeadRect)
 
-    self.speedCount += 1
+    for tile in self.tailTab:
+      pygame.draw.rect(WINDOW, (0, 0, 255), pygame.Rect((tile[0] * TILE_WIDTH) + 50, (tile[1] * TILE_HEIGHT) + 50, TILE_WIDTH, TILE_HEIGHT ))
 
   def move(self):
     self.tailTab.insert(0,self.headPosition)
     self.endOfTailLastPosition = self.tailTab.pop()
 
-    if self.direction == 'left':
-      self.headPosition = (self.headPosition[0] - 1, self.headPosition[1])
-    
-    if self.direction == 'right':
-      self.headPosition = (self.headPosition[0] + 1, self.headPosition[1])
-    
-    if self.direction == 'up':
-      self.headPosition = (self.headPosition[0], self.headPosition[1] - 1)
-    
-    if self.direction == 'down':
-      self.headPosition = (self.headPosition[0], self.headPosition[1] + 1)
+    if self.newDirection == 'left':
+      self.headPosition = pygame.Vector2(self.headPosition[0] - 1, self.headPosition[1])
+      self.snakeHeadImg = self.snakeHeadImgTab[3]
+
+
+    if self.newDirection == 'right':
+      self.headPosition = pygame.Vector2(self.headPosition[0] + 1, self.headPosition[1])
+      self.snakeHeadImg = self.snakeHeadImgTab[1]
+
+
+    if self.newDirection == 'up':
+      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] - 1)
+      self.snakeHeadImg = self.snakeHeadImgTab[0]
+
+
+    if self.newDirection == 'down':
+      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] + 1)
+      self.snakeHeadImg = self.snakeHeadImgTab[2]
+
+
+    self.direction = self.newDirection
 
   def grow(self):
     self.tailTab.append(self.endOfTailLastPosition)
@@ -44,32 +70,41 @@ class Snake(pygame.sprite.Sprite):
   def playerInput(self):
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP] and self.direction != 'down':
-      self.direction = 'up'
+      self.newDirection = 'up'
 
     elif keys[pygame.K_DOWN] and self.direction != 'up':
-      self.direction = 'down'
+      self.newDirection = 'down'
 
     elif keys[pygame.K_LEFT] and self.direction != 'right':
-      self.direction = 'left'
+      self.newDirection = 'left'
 
     elif keys[pygame.K_RIGHT] and self.direction != 'left':
-      self.direction = 'right'
-
+      self.newDirection = 'right'
+      
 class Apple(pygame.sprite.Sprite):
   def __init__(self):
     super().__init__()
-    self.position = (_, _)
+    self.position = pygame.Vector2(1, 1)
     self.isEatten = True
+    self.appleImg = pygame.image.load('./graphics/apple.png').convert_alpha()
   
-  def update(self):
+  def update(self, snakeHead, snakeTail):
+    self.drawApple()
     if self.isEatten:
-      self.spawn()
+      self.spawn(snakeHead, snakeTail)
 
-  def spawn(self):
-    x = randint(0, NUM_OF_COL-1)
-    y = randint(0, NUM_OF_COL-1)
+  def drawApple(self):
+    appleRect = self.appleImg.get_rect(center = (self.position[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.position[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
+    WINDOW.blit(self.appleImg, appleRect)
 
-    self.position = (x,y)
+  def spawn(self, snakeHead, snakeTail):
+    self.position = snakeHead
+
+    while self.position in snakeTail or self.position == snakeHead:
+      x = randint(0, NUM_OF_COL-1)
+      y = randint(0, NUM_OF_COL-1)
+      self.position = pygame.Vector2(x,y)
+
     self.isEatten = False
 
 
@@ -87,87 +122,56 @@ PLAY_SURFACE_HEIGHT = 600
 NUM_OF_COL = 20
 NUM_OF_ROW = 20
 
+TILE_WIDTH = PLAY_SURFACE_WIDTH / NUM_OF_COL
+TILE_HEIGHT = PLAY_SURFACE_HEIGHT / NUM_OF_ROW
+
+PLAY_SURFACE = pygame.Surface((PLAY_SURFACE_WIDTH,PLAY_SURFACE_HEIGHT))
+
 CURRENT_SCORE = Undefined
 
-GAME_MATRIX = []
-for _ in range(NUM_OF_COL + 1):
-    row = []
-    for _ in range(NUM_OF_ROW + 1):
-      row.append(0)
-    GAME_MATRIX.append(row)
 
 
 WINDOW = pygame.display.set_mode((WINTDOW_WIDTH,WINDOW_HEIGHT))
 pygame.display.set_caption('py-snake')
 
-def clearGameMatrix():
-  for i in range(NUM_OF_COL):
-    for j in range(NUM_OF_ROW):
-      GAME_MATRIX[i][j] = 0
 
 def drawBackground():
   WINDOW.fill((121, 144, 147))
 
-def drawLines(playSurface ,numOfCol, numOfRow):
+def drawLines():
   lineColor = (121, 144, 147)
 
-  for i in range(1, numOfRow):
-    nextLinePositionY = (PLAY_SURFACE_HEIGHT/numOfRow) * i
-    pygame.draw.line(playSurface, lineColor, (0, nextLinePositionY), (PLAY_SURFACE_WIDTH, nextLinePositionY))
+  for i in range(1, NUM_OF_ROW):
+    nextLinePositionY = (PLAY_SURFACE_HEIGHT/NUM_OF_ROW) * i
+    pygame.draw.line(PLAY_SURFACE, lineColor, (0, nextLinePositionY), (PLAY_SURFACE_WIDTH, nextLinePositionY))
 
-  for i in range(1, numOfCol):
-    nextLinePositionX = (PLAY_SURFACE_HEIGHT/numOfCol) * i
-    pygame.draw.line(playSurface, lineColor, (nextLinePositionX, 0), (nextLinePositionX, PLAY_SURFACE_HEIGHT))
+  for i in range(1, NUM_OF_COL):
+    nextLinePositionX = (PLAY_SURFACE_HEIGHT/NUM_OF_COL) * i
+    pygame.draw.line(PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, PLAY_SURFACE_HEIGHT))
 
-def drawTilesAndSnake(playSurface, numOfCol, numOfRow):
-  tileWidth = PLAY_SURFACE_WIDTH / numOfCol
-  tileHeight = PLAY_SURFACE_HEIGHT / numOfRow
-
+def drawTiles():
   tileColor1 = (16, 148, 114)
   tileColor2 = (121, 175, 147)
-  appleColor = (255, 0, 0)
-  snakeColor = (0, 0, 255)
 
-  for rowIdx in range(len(GAME_MATRIX)):
-    for colIdx in range(len(GAME_MATRIX[rowIdx])):
+  for rowIdx in range(NUM_OF_COL):
+    for colIdx in range(NUM_OF_ROW):
       if (rowIdx + colIdx) % 2 == 0:
         color = tileColor1
       else:
         color = tileColor2
-
-      if GAME_MATRIX[rowIdx][colIdx] == 1:
-        color = snakeColor
-
-
-      if GAME_MATRIX[rowIdx][colIdx] == 2:
-        color = appleColor
       
-      pygame.draw.rect(playSurface, color, pygame.Rect( (rowIdx * tileWidth), (colIdx * tileHeight), tileWidth, tileHeight ))
+      pygame.draw.rect(PLAY_SURFACE, color, pygame.Rect( (rowIdx * TILE_WIDTH), (colIdx * TILE_HEIGHT), TILE_WIDTH, TILE_HEIGHT ))
 
-def addSnakeToMatrix(snake):
-  GAME_MATRIX[snake.headPosition[0]][snake.headPosition[1]] = 1
-
-  for tile in snake.tailTab:
-    GAME_MATRIX[tile[0]][tile[1]] = 1
   
-def addAppleToMatrix(apple):
-  GAME_MATRIX[apple.position[0]][apple.position[1]] = 2
+def drawPlaySurface():
+  # drawLines()
+  drawTiles()
 
-def drawPlaySurface(numOfCol, numOfRow, snake, apple):
-  clearGameMatrix()
-  addAppleToMatrix(apple)
-  addSnakeToMatrix(snake)
-
-  playSurface = pygame.Surface((PLAY_SURFACE_WIDTH,PLAY_SURFACE_HEIGHT))
-
-  # drawLines(playSurface, numOfCol, numOfRow)
-  drawTilesAndSnake(playSurface, numOfCol, numOfRow)
-
-  WINDOW.blit(playSurface, (50, 50))
+  WINDOW.blit(PLAY_SURFACE, (50, 50))
 
 def gameOverCondition(snake):
-  if (snake.headPosition[0] <= -1 or
-      snake.headPosition[1] <= -1 or
+  if (snake.headPosition[0] < 0 or
+      snake.headPosition[1] < 0 or
       snake.headPosition[0] >= NUM_OF_ROW or
       snake.headPosition[1] >= NUM_OF_COL or
       snake.headPosition in snake.tailTab):
@@ -180,7 +184,7 @@ def eatManager(snake, apple):
   if snake.headPosition == apple.position:
     apple.isEatten = True
     snake.grow()
-    CURRENT_SCORE += 1
+    CURRENT_SCORE += 100
 
 def printScore():
   scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
@@ -192,22 +196,28 @@ apple = Apple()
 
 gameActive = False
 
+SNAKE_MOVE = pygame.USEREVENT
+pygame.time.set_timer(SNAKE_MOVE, 100)
+
 while True:
   for event in pygame.event.get():
     if event.type == pygame.QUIT:
       pygame.quit()
       exit()
 
+    if event.type == SNAKE_MOVE and gameActive:
+      snake.move()
+
   if gameActive:
     drawBackground()
     printScore()
-    drawPlaySurface(NUM_OF_COL, NUM_OF_ROW, snake, apple)
+    drawPlaySurface()
     eatManager(snake, apple)
 
     gameActive = gameOverCondition(snake)
 
     snake.update()
-    apple.update()
+    apple.update(snake.headPosition, snake.tailTab)
   else:
     WINDOW.fill((121, 144, 147))
 
