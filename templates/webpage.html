@@ -1,0 +1,58 @@
+<!DOCTYPE HTML>
+    <html>
+        <head>
+            <title> 148222, 148084 </title>
+
+            <meta http-equiv='content-type' content='text/html; charset=UTF-8'>
+            <meta name='apple-mobile-web-app-capable' content='yes' />
+            <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+            <meta http-equiv='refresh' content='10'>
+
+            <link rel="stylesheet" href='../static/rpi_style.css'/>
+            <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+        </head>
+        
+        <body> 
+            <h1><center> Web Controller </center></h1>
+            <div id='btnContainer'>
+                  <center>
+                  <h3>Nazwa gracza</h3>
+                </center>
+                <center>
+                  <input placeholder="Powiedz kim jesteś" readonly></input>
+                  </center>
+                  <center>
+                  
+                  <button id='name'>Wyslij</button></a>
+                  </center>
+                  </a><br />
+                  
+                  <center>
+                
+                  <button id='up' class="controls">^</button></a>
+                  </center>
+                  <center>
+                  <button id='left' class="controls"><</button></a>
+                  <button id='down' class="controls">v</button></a>
+                  <button id='right' class="controls">></button></a>
+                  </center>
+                  
+             </div>
+
+             <script>
+                // Event Listener
+                var buttonClick = document.getElementById('btnContainer').addEventListener('click', function(event) {
+                  if (event.target.nodeName == "BUTTON") {
+                    var tar = event.target.id;
+                    console.log(tar);
+                    $.getJSON('/'+tar,
+                        function(data) {
+                      //do nothing
+                    });
+
+                    return false;
+                  }
+                });
+            </script>
+    </body>
+</html>
