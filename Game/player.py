@@ -2,8 +2,14 @@ import pygame
 
 
 class Snake(pygame.sprite.Sprite):
-  def __init__(self, NUM_OF_COL: int, NUM_OF_ROW: int, TILE_WIDTH: int):
+  def __init__(self, NUM_OF_COL: int, NUM_OF_ROW: int, TILE_WIDTH: int, player: int):
     super().__init__()
+    if player == 1:
+      self.playerInput = self.player1Input
+    else:
+      self.playerInput = self.player2Input
+
+
     self.headPosition = pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2)
     self.tailTab = [pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 1),pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 2)]
 
@@ -133,6 +139,9 @@ class Snake(pygame.sprite.Sprite):
     self.tailTab.append(self.endOfTailLastPosition)
 
   def playerInput(self):
+    pass
+
+  def player1Input(self):
     keys = pygame.key.get_pressed()
     if keys[pygame.K_UP] and self.direction != 'down':
       self.newDirection = 'up'
@@ -144,4 +153,18 @@ class Snake(pygame.sprite.Sprite):
       self.newDirection = 'left'
 
     elif keys[pygame.K_RIGHT] and self.direction != 'left':
+      self.newDirection = 'right'
+
+  def player2Input(self):
+    keys = pygame.key.get_pressed()
+    if keys[pygame.K_w] and self.direction != 'down':
+      self.newDirection = 'up'
+
+    elif keys[pygame.K_s] and self.direction != 'up':
+      self.newDirection = 'down'
+
+    elif keys[pygame.K_a] and self.direction != 'right':
+      self.newDirection = 'left'
+
+    elif keys[pygame.K_d] and self.direction != 'left':
       self.newDirection = 'right'

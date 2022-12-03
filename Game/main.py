@@ -1,3 +1,4 @@
+from typing import List
 from jinja2 import Undefined
 import pygame
 from sys import exit
@@ -67,13 +68,16 @@ def drawPlaySurface():
 
   WINDOW.blit(PLAY_SURFACE, (50, 50))
 
-def gameOverCondition(snake):
-  if (snake.headPosition[0] < 0 or
-      snake.headPosition[1] < 0 or
-      snake.headPosition[0] >= NUM_OF_ROW or
-      snake.headPosition[1] >= NUM_OF_COL or
-      snake.headPosition in snake.tailTab):
-    return False
+def gameOverCondition(players: List[Snake]):
+  for snake in players:
+    if (snake.headPosition[0] < 0 or
+        snake.headPosition[1] < 0 or
+        snake.headPosition[0] >= NUM_OF_ROW or
+        snake.headPosition[1] >= NUM_OF_COL):
+      return False
+    for tail in players:
+      if (snake.headPosition in tail.tailTab):
+        return False
   return True
 
 def printScore():
@@ -81,7 +85,6 @@ def printScore():
   scoreRect = scoreTxt.get_rect(center = (WINTDOW_WIDTH / 2, 25))
   WINDOW.blit(scoreTxt, scoreRect)
 
-snake = Snake(NUM_OF_COL, NUM_OF_ROW, TILE_WIDTH)
 
 gameActive = False
 
@@ -96,15 +99,17 @@ while True:
 
     if event.type == SNAKE_MOVE and gameActive:
       snake.move()
+      snake2.move()
 
   if gameActive:
     drawBackground()
     printScore()
     drawPlaySurface()
 
-    gameActive = gameOverCondition(snake)
+    gameActive = gameOverCondition([snake, snake2])
 
     snake.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
+    snake2.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
   else:
     WINDOW.fill((121, 144, 147))
 
@@ -124,8 +129,9 @@ while True:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RETURN]:
       gameActive = True
-      snake = Snake(NUM_OF_COL, NUM_OF_ROW, TILE_WIDTH)
+      snake = Snake(NUM_OF_COL, NUM_OF_ROW, TILE_WIDTH, 1)
+      snake2 = Snake(50, 50, TILE_WIDTH, 2)
       CURRENT_SCORE = 0
 
   pygame.display.update()
-  clock.tick(30)
+  clock.tick(60)
