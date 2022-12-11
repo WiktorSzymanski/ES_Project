@@ -89,30 +89,6 @@ class Snake(pygame.sprite.Sprite):
     snakeBodyRect = img.get_rect(center = (position.x * TILE_WIDTH + 50 + TILE_WIDTH / 2, position.y * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
     WINDOW.blit(img, snakeBodyRect)
 
-  def imgVariant(self):
-    for index, tile in enumerate(self.tailTab):
-
-      if index == 0:
-        checkBefore = self.headPosition - self.tailTab[index]
-        checkAfter = self.tailTab[index] - self.tailTab[index + 1]
-        self.imgVariantDraw(checkBefore, checkAfter, tile)
-
-      elif index == len(self.tailTab) - 1:
-        checkBefore = self.tailTab[index - 1] - self.tailTab[index]
-        self.drawTail(checkBefore, tile)
-      
-      else:
-        checkBefore = self.tailTab[index - 1] - self.tailTab[index]
-        checkAfter = self.tailTab[index] - self.tailTab[index + 1]
-        self.imgVariantDraw(checkBefore, checkAfter, tile)
-
-  def move(self):
-    self.tailTab.insert(0,self.headPosition)
-    self.endOfTailLastPosition = self.tailTab.pop()
-
-    if self.newDirection == 'left':
-      self.headPosition = pygame.Vector2(self.headPosition[0] - 1, self.headPosition[1])
-      self.snakeHeadImg = self.snakeHeadImgTab[3]
 
 
     if self.newDirection == 'right':
