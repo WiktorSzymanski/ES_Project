@@ -4,6 +4,7 @@ import pygame
 from sys import exit
 from random import randint
 
+
 from player import Snake
 from game_logic import gameOverCondition, initGameArray
 
