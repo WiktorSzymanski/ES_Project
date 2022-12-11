@@ -5,6 +5,7 @@ from sys import exit
 from random import randint
 
 from player import Snake
+from game_logic import gameOverCondition, initGameArray, placePlayersOnStartPositions
 
 
 pygame.init()
@@ -60,25 +61,12 @@ def drawTiles():
         color = tileColor2
       
       pygame.draw.rect(PLAY_SURFACE, color, pygame.Rect( (rowIdx * TILE_WIDTH), (colIdx * TILE_HEIGHT), TILE_WIDTH, TILE_HEIGHT ))
-
   
 def drawPlaySurface():
   # drawLines()
   drawTiles()
 
   WINDOW.blit(PLAY_SURFACE, (50, 50))
-
-def gameOverCondition(players: List[Snake]):
-  for snake in players:
-    if (snake.headPosition[0] < 0 or
-        snake.headPosition[1] < 0 or
-        snake.headPosition[0] >= NUM_OF_ROW or
-        snake.headPosition[1] >= NUM_OF_COL):
-      return False
-    for tail in players:
-      if (snake.headPosition in tail.tailTab):
-        return False
-  return True
 
 def printScore():
   scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
@@ -106,7 +94,7 @@ while True:
     printScore()
     drawPlaySurface()
 
-    gameActive = gameOverCondition([snake, snake2])
+    gameActive = gameOverCondition([snake, snake2], NUM_OF_ROW, NUM_OF_COL)
 
     snake.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
     snake2.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
@@ -129,8 +117,12 @@ while True:
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RETURN]:
       gameActive = True
-      snake = Snake(NUM_OF_COL, NUM_OF_ROW, TILE_WIDTH, 1)
-      snake2 = Snake(50, 50, TILE_WIDTH, 2)
+      snake = Snake((NUM_OF_COL-5, NUM_OF_ROW-5), TILE_WIDTH, 1)
+      snake2 = Snake((5, 5), TILE_WIDTH, 2)
+      snake2.newDirection = 'down'
+      gameArray = initGameArray(NUM_OF_ROW, NUM_OF_COL)
+      placePlayersOnStartPositions(gameArray, NUM_OF_ROW, NUM_OF_COL)
+
       CURRENT_SCORE = 0
 
   pygame.display.update()
