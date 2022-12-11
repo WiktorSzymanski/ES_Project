@@ -5,7 +5,7 @@ from sys import exit
 from random import randint
 
 from player import Snake
-from game_logic import gameOverCondition, initGameArray, placePlayersOnStartPositions
+from game_logic import gameOverCondition, initGameArray
 
 
 pygame.init()
@@ -28,15 +28,16 @@ TILE_HEIGHT = PLAY_SURFACE_HEIGHT / NUM_OF_ROW
 PLAY_SURFACE = pygame.Surface((PLAY_SURFACE_WIDTH,PLAY_SURFACE_HEIGHT))
 
 CURRENT_SCORE = Undefined
-
+gameArray = Undefined
+who_won = Undefined
 
 
 WINDOW = pygame.display.set_mode((WINTDOW_WIDTH,WINDOW_HEIGHT))
-pygame.display.set_caption('py-snake')
+pygame.display.set_caption('TRON ARCADE')
 
 
 def drawBackground():
-  WINDOW.fill((121, 144, 147))
+  WINDOW.fill((100, 100, 100))
 
 def drawLines():
   lineColor = (121, 144, 147)
@@ -49,23 +50,23 @@ def drawLines():
     nextLinePositionX = (PLAY_SURFACE_HEIGHT/NUM_OF_COL) * i
     pygame.draw.line(PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, PLAY_SURFACE_HEIGHT))
 
-def drawTiles():
-  tileColor1 = (111, 165, 137)
-  tileColor2 = (121, 175, 147)
+def drawWalls():
+  Color1 = (2, 247, 247)
+  Color2 = (255, 255, 0)
 
   for rowIdx in range(NUM_OF_COL):
     for colIdx in range(NUM_OF_ROW):
-      if (rowIdx + colIdx) % 2 == 0:
-        color = tileColor1
+      if gameArray[rowIdx][colIdx] == 1:
+        color = Color1
+      elif gameArray[rowIdx][colIdx] == 2:
+        color = Color2
       else:
-        color = tileColor2
+        color = (0, 0, 0)
       
       pygame.draw.rect(PLAY_SURFACE, color, pygame.Rect( (rowIdx * TILE_WIDTH), (colIdx * TILE_HEIGHT), TILE_WIDTH, TILE_HEIGHT ))
   
 def drawPlaySurface():
   # drawLines()
-  drawTiles()
-
   WINDOW.blit(PLAY_SURFACE, (50, 50))
 
 def printScore():
@@ -77,7 +78,7 @@ def printScore():
 gameActive = False
 
 SNAKE_MOVE = pygame.USEREVENT
-pygame.time.set_timer(SNAKE_MOVE, 100)
+pygame.time.set_timer(SNAKE_MOVE, 50)
 
 while True:
   for event in pygame.event.get():
@@ -86,22 +87,23 @@ while True:
       exit()
 
     if event.type == SNAKE_MOVE and gameActive:
-      snake.move()
-      snake2.move()
+      snake.move(gameArray)
+      snake2.move(gameArray)
 
   if gameActive:
     drawBackground()
     printScore()
     drawPlaySurface()
+    drawWalls()
 
-    gameActive = gameOverCondition([snake, snake2], NUM_OF_ROW, NUM_OF_COL)
+    gameActive, who_won = gameOverCondition([snake, snake2], NUM_OF_ROW, NUM_OF_COL, gameArray)
 
     snake.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
     snake2.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
   else:
     WINDOW.fill((121, 144, 147))
 
-    nameTxt = font.render('py-snake', True, (0, 0, 0))
+    nameTxt = font.render('TRON ARCADE', True, (0, 0, 0))
     nameRect = nameTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 - 100))
     WINDOW.blit(nameTxt, nameRect)
 
@@ -109,8 +111,12 @@ while True:
     startRect = startTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 + 100))
     WINDOW.blit(startTxt, startRect)
 
-    if CURRENT_SCORE != Undefined:
-      overScoreTxt = font.render(f'Your score: {CURRENT_SCORE}', True, (0, 0, 0))
+    if who_won != Undefined:
+      if who_won != 0:
+        overScoreTxt = font.render(f'Player {who_won} won!', True, (0, 0, 0))
+      else:
+        overScoreTxt = font.render(f'Draw!', True, (0, 0, 0))
+
       overScoreRect = overScoreTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2))
       WINDOW.blit(overScoreTxt, overScoreRect)
 
@@ -118,10 +124,9 @@ while True:
     if keys[pygame.K_RETURN]:
       gameActive = True
       snake = Snake((NUM_OF_COL-5, NUM_OF_ROW-5), TILE_WIDTH, 1)
-      snake2 = Snake((5, 5), TILE_WIDTH, 2)
+      snake2 = Snake((4, 4), TILE_WIDTH, 2)
       snake2.newDirection = 'down'
       gameArray = initGameArray(NUM_OF_ROW, NUM_OF_COL)
-      placePlayersOnStartPositions(gameArray, NUM_OF_ROW, NUM_OF_COL)
 
       CURRENT_SCORE = 0
 

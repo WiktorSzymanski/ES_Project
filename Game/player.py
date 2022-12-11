@@ -6,22 +6,27 @@ class Snake(pygame.sprite.Sprite):
   def __init__(self, start_pos: Tuple[int, int], TILE_WIDTH: int, player: int):
     super().__init__()
     if player == 1:
+      self.player = 1
       self.playerInput = self.player1Input
       self.color = (0, 0, 255)
+      self.snakeHeadImg = pygame.image.load('./graphics/blue_motor.png').convert_alpha()
     else:
+      self.player = 2
       self.playerInput = self.player2Input
       self.color = (255,255,0)
+      self.snakeHeadImg = pygame.image.load('./graphics/yellow_motor.png').convert_alpha()
 
 
-    self.headPosition = pygame.Vector2(start_pos)
+    self.headPosition = start_pos
     self.tailTab = []
 
-    self.endOfTailLastPosition = pygame.Vector2(start_pos)
+    self.endOfTailLastPosition = start_pos
     self.direction = 'up'
     self.newDirection = 'up'
-    self.snakeScale = (TILE_WIDTH / 40)
+    # self.snakeScale = (TILE_WIDTH / 40)
+    self.snakeScale = 1/2
 
-    self.snakeHeadImg = pygame.image.load('./graphics/head.png').convert_alpha()
+
     self.snakeHeadImg = pygame.transform.rotozoom(self.snakeHeadImg, 0, self.snakeScale)
     self.snakeHeadImgTab = [self.snakeHeadImg, pygame.transform.rotate(self.snakeHeadImg, 270), pygame.transform.rotate(self.snakeHeadImg, 180), pygame.transform.rotate(self.snakeHeadImg, 90)]
 
@@ -33,29 +38,27 @@ class Snake(pygame.sprite.Sprite):
     snakeHeadRect = self.snakeHeadImg.get_rect(center = (self.headPosition[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.headPosition[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
     WINDOW.blit(self.snakeHeadImg, snakeHeadRect)
 
-    for tile in self.tailTab:
-      pygame.draw.rect(WINDOW, self.color, pygame.Rect((tile[0] * TILE_WIDTH) + 50, (tile[1] * TILE_HEIGHT) + 50, TILE_WIDTH, TILE_HEIGHT ))
-
-  def move(self):
-    self.tailTab.insert(0,self.headPosition)
+  def move(self, gameArray):
+    # self.tailTab.insert(0,self.headPosition)
+    gameArray[self.headPosition[0]][self.headPosition[1]] = self.player
 
     if self.newDirection == 'left':
-      self.headPosition = pygame.Vector2(self.headPosition[0] - 1, self.headPosition[1])
+      self.headPosition = self.headPosition[0] - 1, self.headPosition[1]
       self.snakeHeadImg = self.snakeHeadImgTab[3]
 
 
     if self.newDirection == 'right':
-      self.headPosition = pygame.Vector2(self.headPosition[0] + 1, self.headPosition[1])
+      self.headPosition = self.headPosition[0] + 1, self.headPosition[1]
       self.snakeHeadImg = self.snakeHeadImgTab[1]
 
 
     if self.newDirection == 'up':
-      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] - 1)
+      self.headPosition = self.headPosition[0], self.headPosition[1] - 1
       self.snakeHeadImg = self.snakeHeadImgTab[0]
 
 
     if self.newDirection == 'down':
-      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] + 1)
+      self.headPosition = self.headPosition[0], self.headPosition[1] + 1
       self.snakeHeadImg = self.snakeHeadImgTab[2]
 
 
