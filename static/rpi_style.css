@@ -34,3 +34,8 @@ body{
       background-color: #649cf6; /* Green */
       color: white;
     }
+
+    a{
+      display: inline-block;
+      margin: 0 auto;
+    }

@@ -1,7 +1,7 @@
 from typing import List
 from jinja2 import Undefined
 
-from player import Snake
+from Game.player import Snake
 
 
 def initGameArray(row_num, col_num) -> List[List[int]]:

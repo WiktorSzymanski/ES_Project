@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+    <html>
+        <head>
+    <title> 148222, 148084 </title>
+
+    <meta http-equiv='content-type' content='text/html; charset=UTF-8'>
+    <meta name='apple-mobile-web-app-capable' content='yes' />
+    <meta name='apple-mobile-web-app-status-bar-style' content='black-translucent' />
+    <meta http-equiv='refresh' content='10'>
+
+    <link rel="stylesheet" href='../static/rpi_style.css' />
+</head>
+
+<body>
+    <h1>
+        <center> Gracz 2 </center>
+    </h1>
+    <div id='btnContainer'>
+        <center>
+            <h3>Nazwa gracza:</h3>
+        </center>
+        <center>
+            <input placeholder="Powiedz kim jesteś" readonly>
+        </center>
+
+        <br />
+
+        <center>
+            <button id='up' class="controls">&#94;</button>
+        </center>
+
+        <center>
+            <button id='left' class="controls">&lt;</button>
+            <button id='down' class="controls">v</button>
+            <button id='right' class="controls">&gt;</button>
+        </center>
+        <center>
+            <a href="/">Wróć</a>
+        </center>
+    </div>
+    <script> 
+        var up = document.getElementById("up");
+        var down = document.getElementById("down");
+        var left = document.getElementById("left");
+        var right = document.getElementById("right");
+
+        up.addEventListener("click", ()=>SendEvent("up"))
+        down.addEventListener("click", ()=>SendEvent("down"))
+        left.addEventListener("click", ()=>SendEvent("left"))
+        right.addEventListener("click", ()=>SendEvent("right"))
+        function SendEvent(event){
+            fetch("http://localhost:5001/player2", {
+                method: "POST", 
+                headers: {"Content-Type": "application/json"},
+                body: event
+            })
+            console.log(event)
+            }
+
+    </script>
+</body>
+</html>

@@ -5,131 +5,141 @@ from sys import exit
 from random import randint
 
 
-from player import Snake
-from game_logic import gameOverCondition, initGameArray
+from Game.player import Snake
+from Game.game_logic import gameOverCondition, initGameArray
+
+class Game:
+  def __init__(self) -> None:
+    pygame.init()
+    self.clock = pygame.time.Clock()
+
+    self.font = pygame.font.Font(None, 50)
+
+    self.WINTDOW_WIDTH = 700
+    self.WINDOW_HEIGHT = 700
+
+    self.PLAY_SURFACE_WIDTH = 600
+    self.PLAY_SURFACE_HEIGHT = 600
+
+    self.NUM_OF_COL = 60
+    self.NUM_OF_ROW = 60
+
+    self.TILE_WIDTH = self.PLAY_SURFACE_WIDTH / self.NUM_OF_COL
+    self.TILE_HEIGHT = self.PLAY_SURFACE_HEIGHT / self.NUM_OF_ROW
+
+    self.PLAY_SURFACE = pygame.Surface((self.PLAY_SURFACE_WIDTH,self.PLAY_SURFACE_HEIGHT))
+
+    self.CURRENT_SCORE = Undefined
+    self.gameArray = Undefined
+    self.who_won = Undefined
+    self.players = Undefined
 
 
-pygame.init()
-clock = pygame.time.Clock()
+    self.WINDOW = pygame.display.set_mode((self.WINTDOW_WIDTH,self.WINDOW_HEIGHT))
+    pygame.display.set_caption('TRON ARCADE')
 
-font = pygame.font.Font(None, 50)
+    self.gameActive = False
 
-WINTDOW_WIDTH = 700
-WINDOW_HEIGHT = 700
+    self.SNAKE_MOVE = pygame.USEREVENT
+    pygame.time.set_timer(self.SNAKE_MOVE, 200)
 
-PLAY_SURFACE_WIDTH = 600
-PLAY_SURFACE_HEIGHT = 600
+  def readInput(self, player: int, direction: str):
+    self.players[player-1].newDirection = direction
 
-NUM_OF_COL = 60
-NUM_OF_ROW = 60
+  def drawBackground(self):
+    self.WINDOW.fill((100, 100, 100))
 
-TILE_WIDTH = PLAY_SURFACE_WIDTH / NUM_OF_COL
-TILE_HEIGHT = PLAY_SURFACE_HEIGHT / NUM_OF_ROW
+  def drawLines(self):
+    lineColor = (121, 144, 147)
 
-PLAY_SURFACE = pygame.Surface((PLAY_SURFACE_WIDTH,PLAY_SURFACE_HEIGHT))
+    for i in range(1, self.NUM_OF_ROW):
+      nextLinePositionY = (self.PLAY_SURFACE_HEIGHT/self.NUM_OF_ROW) * i
+      pygame.draw.line(self.PLAY_SURFACE, lineColor, (0, nextLinePositionY), (self.PLAY_SURFACE_WIDTH, nextLinePositionY))
 
-CURRENT_SCORE = Undefined
-gameArray = Undefined
-who_won = Undefined
+    for i in range(1, self.NUM_OF_COL):
+      nextLinePositionX = (self.PLAY_SURFACE_HEIGHT/self.NUM_OF_COL) * i
+      pygame.draw.line(self.PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, self.PLAY_SURFACE_HEIGHT))
 
+  def drawWalls(self):
+    Color1 = (2, 247, 247)
+    Color2 = (255, 255, 0)
 
-WINDOW = pygame.display.set_mode((WINTDOW_WIDTH,WINDOW_HEIGHT))
-pygame.display.set_caption('TRON ARCADE')
+    for rowIdx in range(self.NUM_OF_COL):
+      for colIdx in range(self.NUM_OF_ROW):
+        if self.gameArray[rowIdx][colIdx] == 1:
+          color = Color1
+        elif self.gameArray[rowIdx][colIdx] == 2:
+          color = Color2
+        else:
+          color = (0, 0, 0)
+        
+        pygame.draw.rect(self.PLAY_SURFACE, color, pygame.Rect( (rowIdx * self.TILE_WIDTH), (colIdx * self.TILE_HEIGHT), self.TILE_WIDTH, self.TILE_HEIGHT ))
+    
+  def drawPlaySurface(self):
+    # drawLines()
+    self.WINDOW.blit(self.PLAY_SURFACE, (50, 50))
 
+  def printScore(self):
+    scoreTxt = self.font.render(f'Score: {self.CURRENT_SCORE}', True, (0,0,0))
+    scoreRect = scoreTxt.get_rect(center = (self.WINTDOW_WIDTH / 2, 25))
+    self.WINDOW.blit(scoreTxt, scoreRect)
 
-def drawBackground():
-  WINDOW.fill((100, 100, 100))
-
-def drawLines():
-  lineColor = (121, 144, 147)
-
-  for i in range(1, NUM_OF_ROW):
-    nextLinePositionY = (PLAY_SURFACE_HEIGHT/NUM_OF_ROW) * i
-    pygame.draw.line(PLAY_SURFACE, lineColor, (0, nextLinePositionY), (PLAY_SURFACE_WIDTH, nextLinePositionY))
-
-  for i in range(1, NUM_OF_COL):
-    nextLinePositionX = (PLAY_SURFACE_HEIGHT/NUM_OF_COL) * i
-    pygame.draw.line(PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, PLAY_SURFACE_HEIGHT))
-
-def drawWalls():
-  Color1 = (2, 247, 247)
-  Color2 = (255, 255, 0)
-
-  for rowIdx in range(NUM_OF_COL):
-    for colIdx in range(NUM_OF_ROW):
-      if gameArray[rowIdx][colIdx] == 1:
-        color = Color1
-      elif gameArray[rowIdx][colIdx] == 2:
-        color = Color2
-      else:
-        color = (0, 0, 0)
-      
-      pygame.draw.rect(PLAY_SURFACE, color, pygame.Rect( (rowIdx * TILE_WIDTH), (colIdx * TILE_HEIGHT), TILE_WIDTH, TILE_HEIGHT ))
+  def run(self):
   
-def drawPlaySurface():
-  # drawLines()
-  WINDOW.blit(PLAY_SURFACE, (50, 50))
 
-def printScore():
-  scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
-  scoreRect = scoreTxt.get_rect(center = (WINTDOW_WIDTH / 2, 25))
-  WINDOW.blit(scoreTxt, scoreRect)
+    while True:
+      for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+          pygame.quit()
+          exit()
 
+        if event.type == self.SNAKE_MOVE and self.gameActive:
+          self.players[0].move(self.gameArray)
+          self.players[1].move(self.gameArray)
 
-gameActive = False
+      if self.gameActive:
+        self.drawBackground()
+        self.printScore()
+        self.drawPlaySurface()
+        self.drawWalls()
 
-SNAKE_MOVE = pygame.USEREVENT
-pygame.time.set_timer(SNAKE_MOVE, 50)
+        self.gameActive, self.who_won = gameOverCondition(self.players, self.NUM_OF_ROW, self.NUM_OF_COL, self.gameArray)
 
-while True:
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      pygame.quit()
-      exit()
-
-    if event.type == SNAKE_MOVE and gameActive:
-      snake.move(gameArray)
-      snake2.move(gameArray)
-
-  if gameActive:
-    drawBackground()
-    printScore()
-    drawPlaySurface()
-    drawWalls()
-
-    gameActive, who_won = gameOverCondition([snake, snake2], NUM_OF_ROW, NUM_OF_COL, gameArray)
-
-    snake.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
-    snake2.update(TILE_WIDTH, TILE_HEIGHT, WINDOW)
-  else:
-    WINDOW.fill((121, 144, 147))
-
-    nameTxt = font.render('TRON ARCADE', True, (0, 0, 0))
-    nameRect = nameTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 - 100))
-    WINDOW.blit(nameTxt, nameRect)
-
-    startTxt = font.render('Press Enter to start', True, (0, 0, 0))
-    startRect = startTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 + 100))
-    WINDOW.blit(startTxt, startRect)
-
-    if who_won != Undefined:
-      if who_won != 0:
-        overScoreTxt = font.render(f'Player {who_won} won!', True, (0, 0, 0))
+        self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
+        self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
       else:
-        overScoreTxt = font.render(f'Draw!', True, (0, 0, 0))
+        self.WINDOW.fill((121, 144, 147))
 
-      overScoreRect = overScoreTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2))
-      WINDOW.blit(overScoreTxt, overScoreRect)
+        self.nameTxt = self.font.render('TRON ARCADE', True, (0, 0, 0))
+        self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
+        self.WINDOW.blit(self.nameTxt, self.nameRect)
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_RETURN]:
-      gameActive = True
-      snake = Snake((NUM_OF_COL-5, NUM_OF_ROW-5), TILE_WIDTH, 1)
-      snake2 = Snake((4, 4), TILE_WIDTH, 2)
-      snake2.newDirection = 'down'
-      gameArray = initGameArray(NUM_OF_ROW, NUM_OF_COL)
+        self.startTxt = self.font.render('Press Enter to start', True, (0, 0, 0))
+        self.startRect = self.startTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
+        self.WINDOW.blit(self.startTxt, self.startRect)
 
-      CURRENT_SCORE = 0
+        if self.who_won != Undefined:
+          if self.who_won != 0:
+            self.overScoreTxt = self.font.render(f'Player {self.who_won} won!', True, (0, 0, 0))
+          else:
+            self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
 
-  pygame.display.update()
-  clock.tick(60)
+          self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+          self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
+
+        self.keys = pygame.key.get_pressed()
+        if self.keys[pygame.K_RETURN]:
+          self.gameActive = True
+          self.players = [Snake((self.NUM_OF_COL-5, self.NUM_OF_ROW-5), self.TILE_WIDTH, 1), Snake((4, 4), self.TILE_WIDTH, 2)]
+          self.players[1].newDirection = 'down'
+          self.gameArray = initGameArray(self.NUM_OF_ROW, self.NUM_OF_COL)
+
+          self.CURRENT_SCORE = 0
+
+      pygame.display.update()
+      self.clock.tick(60)
+
+if __name__ == '__main__':
+  game = Game()
+
+  game.run()
