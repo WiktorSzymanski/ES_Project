@@ -51,7 +51,7 @@
         function SendEvent(event){
             fetch("http://localhost:5001/player2", {
                 method: "POST", 
-                headers: {"Content-Type": "application/json"},
+                headers: {"Content-Type": "text/html"},
                 body: event
             })
             console.log(event)

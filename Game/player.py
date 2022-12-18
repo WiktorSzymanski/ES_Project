@@ -9,12 +9,12 @@ class Snake(pygame.sprite.Sprite):
       self.player = 1
       self.playerInput = self.player1Input
       self.color = (0, 0, 255)
-      self.snakeHeadImg = pygame.image.load('.Game/graphics/blue_motor.png').convert_alpha()
+      self.snakeHeadImg = pygame.image.load('./Game/graphics/blue_motor.png').convert_alpha()
     else:
       self.player = 2
       self.playerInput = self.player2Input
       self.color = (255,255,0)
-      self.snakeHeadImg = pygame.image.load('.Game/graphics/yellow_motor.png').convert_alpha()
+      self.snakeHeadImg = pygame.image.load('./Game/graphics/yellow_motor.png').convert_alpha()
 
 
     self.headPosition = start_pos

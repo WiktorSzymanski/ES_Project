@@ -4,6 +4,8 @@ import pygame
 from sys import exit
 from random import randint
 
+from multiprocessing import Queue
+
 
 from Game.player import Snake
 from Game.game_logic import gameOverCondition, initGameArray
@@ -41,7 +43,7 @@ class Game:
     self.gameActive = False
 
     self.SNAKE_MOVE = pygame.USEREVENT
-    pygame.time.set_timer(self.SNAKE_MOVE, 200)
+    pygame.time.set_timer(self.SNAKE_MOVE, 250)
 
   def readInput(self, player: int, direction: str):
     self.players[player-1].newDirection = direction
@@ -84,10 +86,17 @@ class Game:
     scoreRect = scoreTxt.get_rect(center = (self.WINTDOW_WIDTH / 2, 25))
     self.WINDOW.blit(scoreTxt, scoreRect)
 
-  def run(self):
+  def run(self, queue):
   
 
     while True:
+      while not queue.empty():
+        command = queue.get()
+
+        print(f'================COMAND===============\n{command}\n')
+
+        self.players[command[0] - 1].newDirection = command[1]
+
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
           pygame.quit()
