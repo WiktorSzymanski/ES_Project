@@ -86,16 +86,22 @@ class Game:
     scoreRect = scoreTxt.get_rect(center = (self.WINTDOW_WIDTH / 2, 25))
     self.WINDOW.blit(scoreTxt, scoreRect)
 
+  def startGame(self):
+    self.gameActive = True
+    self.players = [Snake((self.NUM_OF_COL-5, self.NUM_OF_ROW-5), self.TILE_WIDTH, 1), Snake((4, 4), self.TILE_WIDTH, 2)]
+    self.players[1].newDirection = 'down'
+    self.gameArray = initGameArray(self.NUM_OF_ROW, self.NUM_OF_COL)
+
   def run(self, queue):
   
 
     while True:
       while not queue.empty():
         command = queue.get()
-
-        print(f'================COMAND===============\n{command}\n')
-
-        self.players[command[0] - 1].newDirection = command[1]
+        if command[1] == 'start':
+          self.startGame()
+        elif self.gameActive:
+          self.players[command[0] - 1].playerInput(command[1])
 
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -138,10 +144,7 @@ class Game:
 
         self.keys = pygame.key.get_pressed()
         if self.keys[pygame.K_RETURN]:
-          self.gameActive = True
-          self.players = [Snake((self.NUM_OF_COL-5, self.NUM_OF_ROW-5), self.TILE_WIDTH, 1), Snake((4, 4), self.TILE_WIDTH, 2)]
-          self.players[1].newDirection = 'down'
-          self.gameArray = initGameArray(self.NUM_OF_ROW, self.NUM_OF_COL)
+          self.startGame()
 
           self.CURRENT_SCORE = 0
 

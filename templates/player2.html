@@ -27,27 +27,36 @@
 
         <center>
             <button id='up' class="controls">&#94;</button>
-        </center>
-
-        <center>
-            <button id='left' class="controls">&lt;</button>
-            <button id='down' class="controls">v</button>
-            <button id='right' class="controls">&gt;</button>
-        </center>
-        <center>
-            <a href="/">Wróć</a>
-        </center>
+            </center>
+    
+            <center>
+                <button id='left' class="controls">&lt;</button>
+    
+                <button id='right' class="controls">&gt;</button>
+            </center>
+    
+            <center>
+                <button id='down' class="controls">v</button>
+            </center>
+            <center>
+                <a href="/">Wróć</a>
+            </center>
+            <center>
+                <button id='start' class="controls">Start</button>
+            </center>
     </div>
     <script> 
         var up = document.getElementById("up");
         var down = document.getElementById("down");
         var left = document.getElementById("left");
         var right = document.getElementById("right");
+        var start = document.getElementById("start");
 
         up.addEventListener("click", ()=>SendEvent("up"))
         down.addEventListener("click", ()=>SendEvent("down"))
         left.addEventListener("click", ()=>SendEvent("left"))
         right.addEventListener("click", ()=>SendEvent("right"))
+        start.addEventListener("click", ()=>SendEvent("start"))
         function SendEvent(event){
             fetch("http://localhost:5001/player2", {
                 method: "POST", 
