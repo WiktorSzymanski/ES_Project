@@ -1,0 +1,89 @@
+body
+{
+    background-color:#7c9393;
+    font-family: Arial, Helvetica, sans-serif;
+    margin: 0 auto;
+    }
+
+div#btnContainer{
+  height: 50vh;
+  padding: 11vh 0;
+}
+#btnContainer{
+text-align: center;
+}
+#btnContainer #sup1, #btnContainer #sup2, #btnContainer #sup3{
+  width: 10vw;
+  height: 10vw;
+  }
+
+button{
+width:auto;
+height:20vw;
+background-color: #025858;
+border: none;
+color: white;
+text-align: center;
+vertical-align:middle;
+text-decoration: none;
+display: inline-block;
+font-size: 4em;
+border-radius: 12px;
+-webkit-transition-duration: 0.4s;
+transition-duration: 0.4s;
+margin: 5px;
+}
+.controls{
+width:20vw;
+}
+button:hover{
+background-color: #809a9a; /* Green */
+color: #025858;
+border: 1px solid black;
+}
+
+
+
+a{
+  display: block;
+  margin: 5px auto;
+  height: 4vh;
+  width: 10vw;
+  font-size: 2.5vh;
+  text-decoration: none;
+  text-align: center;
+  padding: 0.5vh 3vh;
+  border-style: inset;
+  border-width: 5px;
+  border-color: #025858;
+  color: #c5caca;
+  background-color: #809a9a;
+}
+a:hover{
+  transition: .5s;
+  border-style: outset;
+  color: #809a9a;
+  background-color: #c5caca;
+}
+
+a.site1{
+  font-size: 8vh;
+  padding: 16vh 5vh;
+  font-size: 8vh;
+  width: 80vw;
+}
+
+
+h1, h3{
+  width:100%;
+  overflow: hidden;
+  text-align:center;
+  padding:2vh 0;
+  color: #c5caca;
+}
+h1{
+  font-size: 5vh;
+}
+h3{
+  font-size: 3.5vh;
+}
