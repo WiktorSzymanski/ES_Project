@@ -102,7 +102,8 @@ class Game:
           self.startGame()
         elif self.gameActive:
           if command[1] == 'ghost':
-            self.players[command[0] - 1].enterGhostMode()
+            if self.players[command[0] - 1].cooldown == 0:
+              self.players[command[0] - 1].enterGhostMode()
           else:
             self.players[command[0] - 1].playerInput(command[1])
 

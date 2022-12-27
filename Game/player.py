@@ -20,6 +20,7 @@ class Snake(pygame.sprite.Sprite):
     self.ghost_mode = False
 
     self.ghost_mode_timer = 0
+    self.cooldown = 0
 
     self.endOfTailLastPosition = start_pos
     self.direction = 'up'
@@ -37,6 +38,7 @@ class Snake(pygame.sprite.Sprite):
   def enterGhostMode(self):
     self.ghost_mode = True
     self.ghost_mode_timer = 10
+    self.cooldown = 10
 
   def drawSnake(self, TILE_WIDTH: int, TILE_HEIGHT: int, WINDOW):
     snakeHeadRect = self.snakeHeadImg.get_rect(center = (self.headPosition[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.headPosition[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
@@ -45,6 +47,8 @@ class Snake(pygame.sprite.Sprite):
   def move(self, gameArray):
     if not self.ghost_mode:
       gameArray[self.headPosition[0]][self.headPosition[1]] = self.player
+      if self.cooldown != 0:
+        self.cooldown -= 1
     else:
       if self.ghost_mode_timer == 0:
         self.ghost_mode = False
