@@ -17,7 +17,7 @@ def gameOverCondition(players: List[Snake], NUM_OF_ROW, NUM_OF_COL, gameArray):
         snake.headPosition[1] < 0 or
         snake.headPosition[0] >= NUM_OF_ROW or
         snake.headPosition[1] >= NUM_OF_COL or
-        gameArray[snake.headPosition[0]][snake.headPosition[1]] != 0):
+        (gameArray[snake.headPosition[0]][snake.headPosition[1]] != 0 and not snake.ghost_mode)):
       continue_game = False
       if who_lost != 0:
         who_lost = 3
