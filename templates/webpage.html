@@ -23,28 +23,5 @@
         <a href="/player1" class = "site1">Gracz 1</a>
         <a href="/player2" class = "site1">Gracz 2</a>
     </div>
-
-    <script>
-        var buttonClick = document.getElementById('goToGame').addEventListener('click', function(event) {
-            var val = $("#register input[type='radio']:checked").val();
-            if (val==null){
-                val = "webpage.html"
-            }
-
-            url = $(location).attr('href')
-            flag=true;
-            var counter = url.length
-            for (let i = url.length; i >= 0; i--) {
-                if (url[i] == '/') {
-                    url = url.slice(0, counter) + "/" + val;
-                    break;
-                } else {
-                    counter--;
-                }
-            }
-            window.history.pushState(null,null,url);
-        });
-
-    </script>
 </body>
 </html>

@@ -12,10 +12,12 @@ div#btnContainer{
 #btnContainer{
 text-align: center;
 }
-#btnContainer #sup1, #btnContainer #sup2, #btnContainer #sup3{
+#btnContainer #sup1, #btnContainer #start{
   width: 10vw;
   height: 10vw;
+  font-size: 2em;
   }
+
 
 button{
 width:auto;
@@ -33,6 +35,11 @@ border-radius: 12px;
 transition-duration: 0.4s;
 margin: 5px;
 }
+
+.ext-offset{
+  margin: 0 10vw;
+}
+
 .controls{
 width:20vw;
 }
@@ -68,7 +75,7 @@ a:hover{
 
 a.site1{
   font-size: 8vh;
-  padding: 16vh 5vh;
+  padding: 14vh 5vh;
   font-size: 8vh;
   width: 80vw;
 }
