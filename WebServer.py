@@ -6,19 +6,20 @@ import os
 
 app = Flask(__name__)
 
-game = None
-
 def run_game(queue):
-    global game
     game = Game()
     game.run(queue)
 
 queue = Queue()
 process = Process(target=run_game, args=(queue,))
+flag = 0
 
 @app.route('/')
 def start():
-    process.start()
+    global flag
+    if not(flag):
+        flag = 1
+        process.start()
     return render_template("webpage.html")
 
 

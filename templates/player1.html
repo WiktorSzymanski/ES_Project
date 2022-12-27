@@ -9,47 +9,48 @@
     <meta http-equiv='refresh' content='10'>
 
     <link rel="stylesheet" href='../static/rpi_style.css' />
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 </head>
 
 <body>
-    <div id='btnContainer'>
-        <center>
-            <h3>Nazwa gracza:</h3>
-        </center>
-        <center>
-            <input value="imie" readonly>
-        </center>
+    <h1>
+        TRON ARCADE
+    </h1>
+    <h3>
+        Gracz 1
+    </h3>
+    <div id="btnContainer">
 
-        <br />
-        
 
-        <center>
-        <button id='up' class="controls">&#94;</button>
-        </center>
 
-        <center>
+        <div>
+            <button id='up' class="controls">&#94;</button>
+        </div>
+        <div>
             <button id='left' class="controls">&lt;</button>
 
             <button id='right' class="controls">&gt;</button>
-        </center>
-
-        <center>
+        </div>
+        <div>
             <button id='down' class="controls">v</button>
-        </center>
-        <center>
-            <a href="/">Wróć</a>
-        </center>
-        <center>
-            <button id='start' class="controls">Start</button>
-        </center>
-        
-    </div>
+        </div>
 
-    <script> 
-        var up = document.getElementById("up");
-        var down = document.getElementById("down");
-        var left = document.getElementById("left");
-        var right = document.getElementById("right");
+        <div>
+            <button id='sup1' class="controls">1</button>
+            <button id='sup2' class="controls">2</button>
+            <button id='sup3' class="controls">3</button>
+        </div>
+
+        <a href="/">Wróć</a>
+    </div>
+   <script>
+        var up = document.getElementById("up")
+        var down = document.getElementById("down")
+        var left = document.getElementById("left")
+        var right = document.getElementById("right")
+        var sup1 = document.getElementById("sup1")
+        var sup2 = document.getElementById("sup2")
+        var sup3 = document.getElementById("sup3")
         var start = document.getElementById("start");
 
         up.addEventListener("click", ()=>SendEvent("up"))
@@ -57,9 +58,13 @@
         left.addEventListener("click", ()=>SendEvent("left"))
         right.addEventListener("click", ()=>SendEvent("right"))
         start.addEventListener("click", ()=>SendEvent("start"))
+        sup1.addEventListener("click", ()=>SendEvent("sup1"))
+        sup2.addEventListener("click", ()=>SendEvent("sup2"))
+        sup3.addEventListener("click", ()=>SendEvent("sup3"))
+
         function SendEvent(event){
             fetch("http://localhost:5001/player1", {
-                method: "POST", 
+                method: "POST",
                 headers: {"Content-Type": "text/html"},
                 body: event
             })
