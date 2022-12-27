@@ -17,17 +17,22 @@
         TRON ARCADE
     </h1>
     <h3>
-        Gracz2
+        Gracz 2
     </h3>
     <div id="btnContainer">
+
+
 
         <div>
             <button id='up' class="controls">&#94;</button>
         </div>
         <div>
             <button id='left' class="controls">&lt;</button>
-            <button id='down' class="controls">v</button>
+
             <button id='right' class="controls">&gt;</button>
+        </div>
+        <div>
+            <button id='down' class="controls">v</button>
         </div>
 
         <div>
@@ -39,10 +44,6 @@
         <a href="/">Wróć</a>
     </div>
    <script>
-
-    </div>
-      <script>
-
         var up = document.getElementById("up")
         var down = document.getElementById("down")
         var left = document.getElementById("left")
@@ -50,11 +51,13 @@
         var sup1 = document.getElementById("sup1")
         var sup2 = document.getElementById("sup2")
         var sup3 = document.getElementById("sup3")
+        var start = document.getElementById("start");
 
         up.addEventListener("click", ()=>SendEvent("up"))
         down.addEventListener("click", ()=>SendEvent("down"))
         left.addEventListener("click", ()=>SendEvent("left"))
         right.addEventListener("click", ()=>SendEvent("right"))
+        start.addEventListener("click", ()=>SendEvent("start"))
         sup1.addEventListener("click", ()=>SendEvent("sup1"))
         sup2.addEventListener("click", ()=>SendEvent("sup2"))
         sup3.addEventListener("click", ()=>SendEvent("sup3"))
@@ -63,11 +66,11 @@
             fetch("http://localhost:5001/player2", {
                 method: "POST",
                 headers: {"Content-Type": "text/html"},
-
                 body: event
             })
             console.log(event)
             }
 
     </script>
-</body></html>
+</body>
+</html>

@@ -1,314 +1,157 @@
+from typing import List
 from jinja2 import Undefined
 import pygame
 from sys import exit
 from random import randint
 
-class Snake(pygame.sprite.Sprite):
-  def __init__(self):
-    super().__init__()
-    self.headPosition = pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2)
-    self.tailTab = [pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 1),pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2 + 2)]
-
-    self.endOfTailLastPosition = pygame.Vector2(NUM_OF_COL//2, NUM_OF_ROW//2)
-    self.direction = 'up'
-    self.newDirection = 'up'
-    self.snakeScale = (TILE_WIDTH / 40)
-
-    self.snakeHeadImg = pygame.image.load('./graphics/head.png').convert_alpha()
-    self.snakeHeadImg = pygame.transform.rotozoom(self.snakeHeadImg, 0, self.snakeScale)
-    self.snakeHeadImgTab = [self.snakeHeadImg, pygame.transform.rotate(self.snakeHeadImg, 270), pygame.transform.rotate(self.snakeHeadImg, 180), pygame.transform.rotate(self.snakeHeadImg, 90)]
-
-    self.snakeBodyImg = pygame.image.load('./graphics/body.png').convert_alpha()
-    self.snakeBodyImg = pygame.transform.rotozoom(self.snakeBodyImg, 0, self.snakeScale)
-    self.snakeBodyImgTab = [self.snakeBodyImg, pygame.transform.rotate(self.snakeBodyImg, 270), pygame.transform.rotate(self.snakeBodyImg, 180), pygame.transform.rotate(self.snakeBodyImg, 90)]
-
-    self.snakeTurnLeftImg = pygame.image.load('./graphics/turn.png').convert_alpha()
-    self.snakeTurnLeftImg = pygame.transform.rotozoom(self.snakeTurnLeftImg, 0, self.snakeScale)
-    self.snakeTurnLeftImgTab = [self.snakeTurnLeftImg, pygame.transform.rotate(self.snakeTurnLeftImg, 270), pygame.transform.rotate(self.snakeTurnLeftImg, 180), pygame.transform.rotate(self.snakeTurnLeftImg, 90)]
-
-    self.snakeTurnRightImgTab = [pygame.transform.flip(self.snakeTurnLeftImgTab[0], False, True), pygame.transform.flip(self.snakeTurnLeftImgTab[1], False, True), pygame.transform.flip(self.snakeTurnLeftImgTab[2], False, True), pygame.transform.flip(self.snakeTurnLeftImgTab[3], False, True)]
-
-    self.snakeTailImg = pygame.image.load('./graphics/tail.png').convert_alpha()
-    self.snakeTailImg = pygame.transform.rotozoom(self.snakeTailImg, 0, self.snakeScale)
-    self.snakeTailImgTab = [self.snakeTailImg, pygame.transform.rotate(self.snakeTailImg, 270), pygame.transform.rotate(self.snakeTailImg, 180), pygame.transform.rotate(self.snakeTailImg, 90)]
-
-  def update(self):
-    self.drawSnake()
-    self.playerInput()    
-
-  def drawSnake(self):
-    snakeHeadRect = self.snakeHeadImg.get_rect(center = (self.headPosition[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.headPosition[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
-    WINDOW.blit(self.snakeHeadImg, snakeHeadRect)
-
-    for tile in self.tailTab:
-      #pygame.draw.rect(WINDOW, (0, 0, 255), pygame.Rect((tile[0] * TILE_WIDTH) + 50, (tile[1] * TILE_HEIGHT) + 50, TILE_WIDTH, TILE_HEIGHT ))
-      self.imgVariant()
-
-  def drawTail(self, ckBefore, position):
-    if (ckBefore == (1, 0)):
-      img = self.snakeTailImgTab[1]
-    elif (ckBefore == (-1, 0)):
-      img = self.snakeTailImgTab[3]
-    elif (ckBefore == (0, 1)):
-      img = self.snakeTailImgTab[2]
-    elif (ckBefore == (0, -1)):
-      img = self.snakeTailImgTab[0]
-
-    snakeBodyRect = img.get_rect(center = (position.x * TILE_WIDTH + 50 + TILE_WIDTH / 2, position.y * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
-    WINDOW.blit(img, snakeBodyRect)
-
-  def imgVariantDraw(self, ckBefore, ckAfter, position):
-    if (ckBefore == ckAfter == (-1, 0)):
-      img = self.snakeBodyImgTab[1]
-    elif (ckBefore == ckAfter == (1, 0)):
-      img = self.snakeBodyImgTab[3]
-    elif (ckBefore == ckAfter == (0, -1)):
-      img = self.snakeBodyImgTab[2]
-    elif (ckBefore == ckAfter == (0, 1)):
-      img = self.snakeBodyImgTab[0]
-    elif (ckBefore == (-1, 0) and ckAfter == (0, -1)):
-      img = self.snakeTurnLeftImgTab[0]
-    elif (ckBefore == (0, -1) and ckAfter == (1, 0)):
-      img = self.snakeTurnLeftImgTab[1]
-    elif (ckBefore == (1, 0) and ckAfter == (0, 1)):
-      img = self.snakeTurnLeftImgTab[2]
-    elif (ckBefore == (0, 1) and ckAfter == (-1, 0)):
-      img = self.snakeTurnLeftImgTab[3]
-    # Right
-    elif (ckBefore == (0, -1) and ckAfter == (-1, 0)):
-      img = self.snakeTurnRightImgTab[3]
-    elif (ckBefore == (1, 0) and ckAfter == (0, -1)):
-      img = self.snakeTurnRightImgTab[2]
-    elif (ckBefore == (0, 1) and ckAfter == (1, 0)):
-      img = self.snakeTurnRightImgTab[1]
-    elif (ckBefore == (-1, 0) and ckAfter == (0, 1)):
-      img = self.snakeTurnRightImgTab[0]
-    else:
-      img = self.snakeTailImg
-
-    snakeBodyRect = img.get_rect(center = (position.x * TILE_WIDTH + 50 + TILE_WIDTH / 2, position.y * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
-    WINDOW.blit(img, snakeBodyRect)
-
-  def imgVariant(self):
-    for index, tile in enumerate(self.tailTab):
-
-      if index == 0:
-        checkBefore = self.headPosition - self.tailTab[index]
-        checkAfter = self.tailTab[index] - self.tailTab[index + 1]
-        self.imgVariantDraw(checkBefore, checkAfter, tile)
-
-      elif index == len(self.tailTab) - 1:
-        checkBefore = self.tailTab[index - 1] - self.tailTab[index]
-        self.drawTail(checkBefore, tile)
-      
-      else:
-        checkBefore = self.tailTab[index - 1] - self.tailTab[index]
-        checkAfter = self.tailTab[index] - self.tailTab[index + 1]
-        self.imgVariantDraw(checkBefore, checkAfter, tile)
+from multiprocessing import Queue
 
-  def move(self):
-    self.tailTab.insert(0,self.headPosition)
-    self.endOfTailLastPosition = self.tailTab.pop()
 
-    if self.newDirection == 'left':
-      self.headPosition = pygame.Vector2(self.headPosition[0] - 1, self.headPosition[1])
-      self.snakeHeadImg = self.snakeHeadImgTab[3]
+from Game.player import Snake
+from Game.game_logic import gameOverCondition, initGameArray
 
+class Game:
+  def __init__(self) -> None:
+    pygame.init()
+    self.clock = pygame.time.Clock()
 
-    if self.newDirection == 'right':
-      self.headPosition = pygame.Vector2(self.headPosition[0] + 1, self.headPosition[1])
-      self.snakeHeadImg = self.snakeHeadImgTab[1]
+    self.font = pygame.font.Font(None, 50)
 
+    self.WINTDOW_WIDTH = 700
+    self.WINDOW_HEIGHT = 700
 
-    if self.newDirection == 'up':
-      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] - 1)
-      self.snakeHeadImg = self.snakeHeadImgTab[0]
+    self.PLAY_SURFACE_WIDTH = 600
+    self.PLAY_SURFACE_HEIGHT = 600
 
+    self.NUM_OF_COL = 60
+    self.NUM_OF_ROW = 60
 
-    if self.newDirection == 'down':
-      self.headPosition = pygame.Vector2(self.headPosition[0], self.headPosition[1] + 1)
-      self.snakeHeadImg = self.snakeHeadImgTab[2]
+    self.TILE_WIDTH = self.PLAY_SURFACE_WIDTH / self.NUM_OF_COL
+    self.TILE_HEIGHT = self.PLAY_SURFACE_HEIGHT / self.NUM_OF_ROW
 
+    self.PLAY_SURFACE = pygame.Surface((self.PLAY_SURFACE_WIDTH,self.PLAY_SURFACE_HEIGHT))
 
-    self.direction = self.newDirection
+    self.CURRENT_SCORE = Undefined
+    self.gameArray = Undefined
+    self.who_won = Undefined
+    self.players = Undefined
 
-  def grow(self):
-    self.tailTab.append(self.endOfTailLastPosition)
 
-  def playerInput(self):
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_UP] and self.direction != 'down':
-      self.newDirection = 'up'
+    self.WINDOW = pygame.display.set_mode((self.WINTDOW_WIDTH,self.WINDOW_HEIGHT))
+    pygame.display.set_caption('TRON ARCADE')
 
-    elif keys[pygame.K_DOWN] and self.direction != 'up':
-      self.newDirection = 'down'
+    self.gameActive = False
 
-    elif keys[pygame.K_LEFT] and self.direction != 'right':
-      self.newDirection = 'left'
+    self.SNAKE_MOVE = pygame.USEREVENT
+    pygame.time.set_timer(self.SNAKE_MOVE, 250)
 
-    elif keys[pygame.K_RIGHT] and self.direction != 'left':
-      self.newDirection = 'right'
-      
-class Apple(pygame.sprite.Sprite):
-  def __init__(self):
-    super().__init__()
-    self.position = pygame.Vector2(1, 1)
-    self.isEatten = True
-    self.appleImg = pygame.image.load('./graphics/apple.png').convert_alpha()
-  
-  def update(self, snakeHead, snakeTail):
-    self.drawApple()
-    if self.isEatten:
-      self.spawn(snakeHead, snakeTail)
+  def readInput(self, player: int, direction: str):
+    self.players[player-1].newDirection = direction
 
-  def drawApple(self):
-    appleRect = self.appleImg.get_rect(center = (self.position[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.position[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
-    WINDOW.blit(self.appleImg, appleRect)
+  def drawBackground(self):
+    self.WINDOW.fill((100, 100, 100))
 
-  def spawn(self, snakeHead, snakeTail):
-    self.position = snakeHead
+  def drawLines(self):
+    lineColor = (121, 144, 147)
 
-    while self.position in snakeTail or self.position == snakeHead:
-      x = randint(0, NUM_OF_COL-1)
-      y = randint(0, NUM_OF_COL-1)
-      self.position = pygame.Vector2(x,y)
+    for i in range(1, self.NUM_OF_ROW):
+      nextLinePositionY = (self.PLAY_SURFACE_HEIGHT/self.NUM_OF_ROW) * i
+      pygame.draw.line(self.PLAY_SURFACE, lineColor, (0, nextLinePositionY), (self.PLAY_SURFACE_WIDTH, nextLinePositionY))
 
-    self.isEatten = False
+    for i in range(1, self.NUM_OF_COL):
+      nextLinePositionX = (self.PLAY_SURFACE_HEIGHT/self.NUM_OF_COL) * i
+      pygame.draw.line(self.PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, self.PLAY_SURFACE_HEIGHT))
 
+  def drawWalls(self):
+    Color1 = (2, 247, 247)
+    Color2 = (255, 255, 0)
 
-pygame.init()
-clock = pygame.time.Clock()
-
-font = pygame.font.Font(None, 50)
-
-WINTDOW_WIDTH = 700
-WINDOW_HEIGHT = 700
-
-PLAY_SURFACE_WIDTH = 600
-PLAY_SURFACE_HEIGHT = 600
-
-NUM_OF_COL = 20
-NUM_OF_ROW = 20
-
-TILE_WIDTH = PLAY_SURFACE_WIDTH / NUM_OF_COL
-TILE_HEIGHT = PLAY_SURFACE_HEIGHT / NUM_OF_ROW
-
-PLAY_SURFACE = pygame.Surface((PLAY_SURFACE_WIDTH,PLAY_SURFACE_HEIGHT))
-
-CURRENT_SCORE = Undefined
-
-
-
-WINDOW = pygame.display.set_mode((WINTDOW_WIDTH,WINDOW_HEIGHT))
-pygame.display.set_caption('py-snake')
-
-
-def drawBackground():
-  WINDOW.fill((121, 144, 147))
-
-def drawLines():
-  lineColor = (121, 144, 147)
-
-  for i in range(1, NUM_OF_ROW):
-    nextLinePositionY = (PLAY_SURFACE_HEIGHT/NUM_OF_ROW) * i
-    pygame.draw.line(PLAY_SURFACE, lineColor, (0, nextLinePositionY), (PLAY_SURFACE_WIDTH, nextLinePositionY))
-
-  for i in range(1, NUM_OF_COL):
-    nextLinePositionX = (PLAY_SURFACE_HEIGHT/NUM_OF_COL) * i
-    pygame.draw.line(PLAY_SURFACE, lineColor, (nextLinePositionX, 0), (nextLinePositionX, PLAY_SURFACE_HEIGHT))
-
-def drawTiles():
-  tileColor1 = (111, 165, 137)
-  tileColor2 = (121, 175, 147)
-
-  for rowIdx in range(NUM_OF_COL):
-    for colIdx in range(NUM_OF_ROW):
-      if (rowIdx + colIdx) % 2 == 0:
-        color = tileColor1
-      else:
-        color = tileColor2
-      
-      pygame.draw.rect(PLAY_SURFACE, color, pygame.Rect( (rowIdx * TILE_WIDTH), (colIdx * TILE_HEIGHT), TILE_WIDTH, TILE_HEIGHT ))
-
-  
-def drawPlaySurface():
-  # drawLines()
-  drawTiles()
-
-  WINDOW.blit(PLAY_SURFACE, (50, 50))
-
-def gameOverCondition(snake):
-  if (snake.headPosition[0] < 0 or
-      snake.headPosition[1] < 0 or
-      snake.headPosition[0] >= NUM_OF_ROW or
-      snake.headPosition[1] >= NUM_OF_COL or
-      snake.headPosition in snake.tailTab):
-    return False
-  return True
-
-def eatManager(snake, apple):
-  global CURRENT_SCORE
-
-  if snake.headPosition == apple.position:
-    apple.isEatten = True
-    snake.grow()
-    CURRENT_SCORE += 100
-
-def printScore():
-  scoreTxt = font.render(f'Score: {CURRENT_SCORE}', True, (0,0,0))
-  scoreRect = scoreTxt.get_rect(center = (WINTDOW_WIDTH / 2, 25))
-  WINDOW.blit(scoreTxt, scoreRect)
-
-snake = Snake()
-apple = Apple()
-
-gameActive = False
-
-SNAKE_MOVE = pygame.USEREVENT
-pygame.time.set_timer(SNAKE_MOVE, 100)
-
-while True:
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      pygame.quit()
-      exit()
-
-    if event.type == SNAKE_MOVE and gameActive:
-      snake.move()
-
-  if gameActive:
-    drawBackground()
-    printScore()
-    drawPlaySurface()
-    eatManager(snake, apple)
-
-    gameActive = gameOverCondition(snake)
-
-    snake.update()
-    apple.update(snake.headPosition, snake.tailTab)
-  else:
-    WINDOW.fill((121, 144, 147))
-
+    for rowIdx in range(self.NUM_OF_COL):
+      for colIdx in range(self.NUM_OF_ROW):
+        if self.gameArray[rowIdx][colIdx] == 1:
+          color = Color1
+        elif self.gameArray[rowIdx][colIdx] == 2:
+          color = Color2
+        else:
+          color = (0, 0, 0)
+        
+        pygame.draw.rect(self.PLAY_SURFACE, color, pygame.Rect( (rowIdx * self.TILE_WIDTH), (colIdx * self.TILE_HEIGHT), self.TILE_WIDTH, self.TILE_HEIGHT ))
     
-    nameTxt = font.render('py-snake', True, (0, 0, 0))
-    nameRect = nameTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 - 100))
-    WINDOW.blit(nameTxt, nameRect)
+  def drawPlaySurface(self):
+    # drawLines()
+    self.WINDOW.blit(self.PLAY_SURFACE, (50, 50))
 
-    startTxt = font.render('Press Enter to start', True, (0, 0, 0))
-    startRect = startTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2 + 100))
-    WINDOW.blit(startTxt, startRect)
+  def printScore(self):
+    scoreTxt = self.font.render(f'Score: {self.CURRENT_SCORE}', True, (0,0,0))
+    scoreRect = scoreTxt.get_rect(center = (self.WINTDOW_WIDTH / 2, 25))
+    self.WINDOW.blit(scoreTxt, scoreRect)
 
-    if CURRENT_SCORE != Undefined:
-      overScoreTxt = font.render(f'Your score: {CURRENT_SCORE}', True, (0, 0, 0))
-      overScoreRect = overScoreTxt.get_rect(center = (WINTDOW_WIDTH/2, WINDOW_HEIGHT/2))
-      WINDOW.blit(overScoreTxt, overScoreRect)
+  def startGame(self):
+    self.gameActive = True
+    self.players = [Snake((self.NUM_OF_COL-5, self.NUM_OF_ROW-5), self.TILE_WIDTH, 1), Snake((4, 4), self.TILE_WIDTH, 2)]
+    self.players[1].newDirection = 'down'
+    self.gameArray = initGameArray(self.NUM_OF_ROW, self.NUM_OF_COL)
 
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_RETURN]:
-      gameActive = True
-      snake = Snake()
-      apple = Apple()
-      CURRENT_SCORE = 0
+  def run(self, queue):
+  
 
-  pygame.display.update()
-  clock.tick(60)
+    while True:
+      while not queue.empty():
+        command = queue.get()
+        if command[1] == 'start':
+          self.startGame()
+        elif self.gameActive:
+          self.players[command[0] - 1].playerInput(command[1])
+
+      for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+          pygame.quit()
+          exit()
+
+        if event.type == self.SNAKE_MOVE and self.gameActive:
+          self.players[0].move(self.gameArray)
+          self.players[1].move(self.gameArray)
+
+      if self.gameActive:
+        self.drawBackground()
+        self.printScore()
+        self.drawPlaySurface()
+        self.drawWalls()
+
+        self.gameActive, self.who_won = gameOverCondition(self.players, self.NUM_OF_ROW, self.NUM_OF_COL, self.gameArray)
+
+        self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
+        self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
+      else:
+        self.WINDOW.fill((121, 144, 147))
+
+        self.nameTxt = self.font.render('TRON ARCADE', True, (0, 0, 0))
+        self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
+        self.WINDOW.blit(self.nameTxt, self.nameRect)
+
+        self.startTxt = self.font.render('Press Enter to start', True, (0, 0, 0))
+        self.startRect = self.startTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
+        self.WINDOW.blit(self.startTxt, self.startRect)
+
+        if self.who_won != Undefined:
+          if self.who_won != 0:
+            self.overScoreTxt = self.font.render(f'Player {self.who_won} won!', True, (0, 0, 0))
+          else:
+            self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
+
+          self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+          self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
+
+        self.keys = pygame.key.get_pressed()
+        if self.keys[pygame.K_RETURN]:
+          self.startGame()
+
+          self.CURRENT_SCORE = 0
+
+      pygame.display.update()
+      self.clock.tick(60)
+
+if __name__ == '__main__':
+  game = Game()
+
+  game.run()

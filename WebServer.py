@@ -6,17 +6,7 @@ import os
 
 app = Flask(__name__)
 
-
 def run_game(queue):
-    global game
-    game = Game()
-    game.run(queue)
-
-queue = Queue()
-process = Process(target=run_game, args=(queue,))
-
-def run_game(queue):
-    global game
     game = Game()
     game.run(queue)
 
