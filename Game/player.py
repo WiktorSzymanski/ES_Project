@@ -17,6 +17,10 @@ class Snake(pygame.sprite.Sprite):
 
     self.headPosition = start_pos
     self.tailTab = []
+    self.ghost_mode = False
+
+    self.ghost_mode_timer = 0
+    self.cooldown = 0
 
     self.endOfTailLastPosition = start_pos
     self.direction = 'up'
@@ -31,13 +35,25 @@ class Snake(pygame.sprite.Sprite):
   def update(self, TILE_WIDTH: int, TILE_HEIGHT: int, WINDOW):
     self.drawSnake(TILE_WIDTH, TILE_HEIGHT, WINDOW)  
 
+  def enterGhostMode(self):
+    self.ghost_mode = True
+    self.ghost_mode_timer = 10
+    self.cooldown = 10
+
   def drawSnake(self, TILE_WIDTH: int, TILE_HEIGHT: int, WINDOW):
     snakeHeadRect = self.snakeHeadImg.get_rect(center = (self.headPosition[0] * TILE_WIDTH + 50 + TILE_WIDTH / 2, self.headPosition[1] * TILE_HEIGHT + 50  + TILE_HEIGHT / 2))
     WINDOW.blit(self.snakeHeadImg, snakeHeadRect)
 
   def move(self, gameArray):
-    # self.tailTab.insert(0,self.headPosition)
-    gameArray[self.headPosition[0]][self.headPosition[1]] = self.player
+    if not self.ghost_mode:
+      gameArray[self.headPosition[0]][self.headPosition[1]] = self.player
+      if self.cooldown != 0:
+        self.cooldown -= 1
+    else:
+      if self.ghost_mode_timer == 0:
+        self.ghost_mode = False
+      else:
+        self.ghost_mode_timer -= 1
 
     if self.newDirection == 'left':
       self.headPosition = self.headPosition[0] - 1, self.headPosition[1]

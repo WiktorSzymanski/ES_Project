@@ -101,7 +101,11 @@ class Game:
         if command[1] == 'start':
           self.startGame()
         elif self.gameActive:
-          self.players[command[0] - 1].playerInput(command[1])
+          if command[1] == 'ghost':
+            if self.players[command[0] - 1].cooldown == 0:
+              self.players[command[0] - 1].enterGhostMode()
+          else:
+            self.players[command[0] - 1].playerInput(command[1])
 
       for event in pygame.event.get():
         if event.type == pygame.QUIT:
