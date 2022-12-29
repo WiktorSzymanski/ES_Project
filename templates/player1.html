@@ -27,23 +27,18 @@
             <button id='up' class="controls">&#94;</button>
         </div>
         <div>
-            <button id='left' class="controls">&lt;</button>
+            <button id='left' class="controls ext-offset">&lt;</button>
 
-            <button id='right' class="controls">&gt;</button>
+            <button id='right' class="controls ext-offset">&gt;</button>
         </div>
         <div>
             <button id='down' class="controls">v</button>
         </div>
 
         <div>
-            <button id='sup1' class="controls">1</button>
-            <button id='sup2' class="controls">2</button>
-            <button id='sup3' class="controls">3</button>
+            <button id='sup1' class="controls">Ghost</button>
+            <button id='start' class="controls">start</button>
         </div>
-        <div>
-            <button id='start' class="start">start</button>
-        </div>
-
         <a href="/">Wróć</a>
     </div>
    <script>
@@ -52,8 +47,6 @@
         var left = document.getElementById("left")
         var right = document.getElementById("right")
         var sup1 = document.getElementById("sup1")
-        var sup2 = document.getElementById("sup2")
-        var sup3 = document.getElementById("sup3")
         var start = document.getElementById("start");
 
         up.addEventListener("click", ()=>SendEvent("up"))
@@ -62,8 +55,7 @@
         right.addEventListener("click", ()=>SendEvent("right"))
         start.addEventListener("click", ()=>SendEvent("start"))
         sup1.addEventListener("click", ()=>SendEvent("ghost"))
-        sup2.addEventListener("click", ()=>SendEvent("sup2"))
-        sup3.addEventListener("click", ()=>SendEvent("sup3"))
+
 
         function SendEvent(event){
             fetch("http://localhost:5001/player1", {
