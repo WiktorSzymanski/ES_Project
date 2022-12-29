@@ -36,6 +36,8 @@ class Game:
     self.who_won = Undefined
     self.players = Undefined
 
+    self.readyCheck = [False, False]
+
 
     self.WINDOW = pygame.display.set_mode((self.WINTDOW_WIDTH,self.WINDOW_HEIGHT))
     pygame.display.set_caption('TRON ARCADE')
@@ -99,7 +101,7 @@ class Game:
       while not queue.empty():
         command = queue.get()
         if command[1] == 'start':
-          self.startGame()
+          self.readyCheck[command[0] - 1] = True
         elif self.gameActive:
           self.players[command[0] - 1].playerInput(command[1])
 
@@ -114,7 +116,7 @@ class Game:
 
       if self.gameActive:
         self.drawBackground()
-        self.printScore()
+        # self.printScore()
         self.drawPlaySurface()
         self.drawWalls()
 
@@ -122,16 +124,24 @@ class Game:
 
         self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
         self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
+
+        if not self.gameActive:
+          self.readyCheck = [False, False]
       else:
+        if self.readyCheck[0] and self.readyCheck[1]:
+          self.startGame()
         self.WINDOW.fill((121, 144, 147))
 
         self.nameTxt = self.font.render('TRON ARCADE', True, (0, 0, 0))
         self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
         self.WINDOW.blit(self.nameTxt, self.nameRect)
 
-        self.startTxt = self.font.render('Press Enter to start', True, (0, 0, 0))
-        self.startRect = self.startTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
-        self.WINDOW.blit(self.startTxt, self.startRect)
+        self.player1 = self.font.render(f'Player1 {self.readyCheck[0]}', True, (0, 0, 0))
+        self.player2 = self.font.render(f'Player2 {self.readyCheck[1]}', True, (0, 0, 0))
+        self.startRect = self.player1.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
+        self.startRect2 = self.player2.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 150))
+        self.WINDOW.blit(self.player1, self.startRect)
+        self.WINDOW.blit(self.player2, self.startRect2)
 
         if self.who_won != Undefined:
           if self.who_won != 0:
