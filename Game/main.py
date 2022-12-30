@@ -43,6 +43,9 @@ class Game:
     pygame.display.set_caption('TRON ARCADE')
 
     self.gameActive = False
+    self.mainGameActive = False
+
+    self.points = [0, 0]
 
     self.SNAKE_MOVE = pygame.USEREVENT
     pygame.time.set_timer(self.SNAKE_MOVE, 250)
@@ -94,6 +97,11 @@ class Game:
     self.players[1].newDirection = 'down'
     self.gameArray = initGameArray(self.NUM_OF_ROW, self.NUM_OF_COL)
 
+  def startMainGame(self):
+    self.points = [0, 0]
+    self.startGame()
+    self.mainGameActive = True
+
   def run(self, queue):
   
 
@@ -125,20 +133,17 @@ class Game:
         self.drawWalls()
 
         self.gameActive, self.who_won = gameOverCondition(self.players, self.NUM_OF_ROW, self.NUM_OF_COL, self.gameArray)
-
+        if not self.gameActive:
+          self.points[self.who_won-1] += 1
         self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
         self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
 
         if not self.gameActive:
           self.readyCheck = [False, False]
-      else:
+      elif self.mainGameActive:
         if self.readyCheck[0] and self.readyCheck[1]:
           self.startGame()
         self.WINDOW.fill((121, 144, 147))
-
-        self.nameTxt = self.font.render('TRON ARCADE', True, (0, 0, 0))
-        self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
-        self.WINDOW.blit(self.nameTxt, self.nameRect)
 
         self.player1 = self.font.render(f'Player1 {self.readyCheck[0]}', True, (0, 0, 0))
         self.player2 = self.font.render(f'Player2 {self.readyCheck[1]}', True, (0, 0, 0))
@@ -153,8 +158,41 @@ class Game:
           else:
             self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
 
-          self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
-          self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
+        if self.points[self.who_won-1] >= 3:
+          self.mainGameActive = False
+
+        self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+        self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
+
+        self.pointsTxt = self.font.render(f"{self.points[0]} : {self.points[1]}", True, (0, 0, 0))
+        self.pointsRect = self.pointsTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 200))
+        self.WINDOW.blit(self.pointsTxt, self.nameRect)
+
+      else:
+        if self.readyCheck[0] and self.readyCheck[1]:
+          self.startMainGame()
+        self.WINDOW.fill((121, 144, 147))
+
+        self.nameTxt = self.font.render('TRON ARCADE', True, (0, 0, 0))
+        self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
+        self.WINDOW.blit(self.nameTxt, self.nameRect)
+
+        self.player1 = self.font.render(f'Player1 {self.readyCheck[0]}', True, (0, 0, 0))
+        self.player2 = self.font.render(f'Player2 {self.readyCheck[1]}', True, (0, 0, 0))
+        self.startRect = self.player1.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
+        self.startRect2 = self.player2.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 150))
+        self.WINDOW.blit(self.player1, self.startRect)
+        self.WINDOW.blit(self.player2, self.startRect2)
+
+        if self.points[0] > self.points[1]:
+          self.overScoreTxt = self.font.render(f'Player 1 won the game!', True, (0, 0, 0))
+        elif self.points[0] < self.points[1]:
+          self.overScoreTxt = self.font.render(f'Player 2 won the game!', True, (0, 0, 0))
+        else:
+          self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
+
+        self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+        self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
 
         self.keys = pygame.key.get_pressed()
         if self.keys[pygame.K_RETURN]:
