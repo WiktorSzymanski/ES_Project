@@ -15,7 +15,7 @@ class Game:
     pygame.init()
     self.clock = pygame.time.Clock()
 
-    self.font = pygame.font.SysFont('arial+', 50)
+    self.font = pygame.font.SysFont('arial', 50)
 
     self.WINTDOW_WIDTH = 700
     self.WINDOW_HEIGHT = 700
