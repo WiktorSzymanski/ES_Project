@@ -3,6 +3,21 @@ from jinja2 import Undefined
 import pygame
 from sys import exit
 from random import randint
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(19, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(13, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(21, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(20, GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup(16, GPIO.OUT, initial=GPIO.LOW)
+
+players_leds = [[26, 19, 13],[21, 20, 16]]
+
+
 
 from multiprocessing import Queue
 
@@ -101,6 +116,20 @@ class Game:
     self.points = [0, 0]
     self.startGame()
     self.mainGameActive = True
+    self.clearLeds()
+
+  def setLeds(self):
+    for n in range(len(self.points)):
+      for i in range(self.points[n]):
+        if not GPIO.input(players_leds[n][i]):
+          GPIO.output(players_leds[n][i], GPIO.HIGH)
+
+
+  def clearLeds(self):
+    for n in range(len(self.points)):
+      for i in range(len(players_leds[n])):
+        if GPIO.input(players_leds[n][i]):
+          GPIO.output(players_leds[n][i], GPIO.LOW)
 
   def run(self, queue):
     while True:
@@ -133,6 +162,7 @@ class Game:
         self.gameActive, self.who_won = gameOverCondition(self.players, self.NUM_OF_ROW, self.NUM_OF_COL, self.gameArray)
         if not self.gameActive and self.who_won is not 0:
           self.points[self.who_won-1] += 1
+          self.setLeds()
         self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
         self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
 
