@@ -2,7 +2,7 @@ import RPi.GPIO as GPIO
 import time
 
 GPIO.setwarnings(False)
-GPIO.setmode(GPIO.BOARD)
+GPIO.setmode(GPIO.BCM)
 GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
 
 try:
