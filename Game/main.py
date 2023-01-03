@@ -36,7 +36,7 @@ class Game:
     self.who_won = Undefined
     self.players = Undefined
 
-    self.readyCheck = [False, False]
+    self.readyCheck = [-1, -1]
 
 
     self.WINDOW = pygame.display.set_mode((self.WINTDOW_WIDTH,self.WINDOW_HEIGHT))
@@ -103,13 +103,11 @@ class Game:
     self.mainGameActive = True
 
   def run(self, queue):
-  
-
     while True:
       while not queue.empty():
         command = queue.get()
         if command[1] == 'start':
-          self.readyCheck[command[0] - 1] = True
+          self.readyCheck[command[0] - 1] *= -1
         elif self.gameActive:
           if command[1] == 'ghost':
             if self.players[command[0] - 1].cooldown == 0:
@@ -133,15 +131,15 @@ class Game:
         self.drawWalls()
 
         self.gameActive, self.who_won = gameOverCondition(self.players, self.NUM_OF_ROW, self.NUM_OF_COL, self.gameArray)
-        if not self.gameActive:
+        if not self.gameActive and self.who_won is not 0:
           self.points[self.who_won-1] += 1
         self.players[0].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
         self.players[1].update(self.TILE_WIDTH, self.TILE_HEIGHT, self.WINDOW)
 
         if not self.gameActive:
-          self.readyCheck = [False, False]
+          self.readyCheck = [-1, -1]
       elif self.mainGameActive:
-        if self.readyCheck[0] and self.readyCheck[1]:
+        if sum(self.readyCheck) is 2:
           self.startGame()
         self.WINDOW.fill((121, 144, 147))
 
@@ -169,7 +167,7 @@ class Game:
         self.WINDOW.blit(self.pointsTxt, self.nameRect)
 
       else:
-        if self.readyCheck[0] and self.readyCheck[1]:
+        if sum(self.readyCheck) is 2:
           self.startMainGame()
         self.WINDOW.fill((121, 144, 147))
 
