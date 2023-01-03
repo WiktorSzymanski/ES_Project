@@ -101,11 +101,6 @@ class Game:
     # drawLines()
     self.WINDOW.blit(self.PLAY_SURFACE, (50, 50))
 
-  def printScore(self):
-    scoreTxt = self.font.render(f'Score: {self.CURRENT_SCORE}', True, (0,0,0))
-    scoreRect = scoreTxt.get_rect(center = (self.WINTDOW_WIDTH / 2, 25))
-    self.WINDOW.blit(scoreTxt, scoreRect)
-
   def startGame(self):
     self.gameActive = True
     self.players = [Snake((self.NUM_OF_COL-5, self.NUM_OF_ROW-5), self.TILE_WIDTH, 1), Snake((4, 4), self.TILE_WIDTH, 2)]
@@ -118,11 +113,15 @@ class Game:
     self.mainGameActive = True
     self.clearLeds()
 
+  def readyToString(self, is_ready):
+    return "ready" if is_ready == 1 else "not ready"
+
   def setLeds(self):
     for n in range(len(self.points)):
       for i in range(self.points[n]):
         if not GPIO.input(players_leds[n][i]):
           GPIO.output(players_leds[n][i], GPIO.HIGH)
+    # pass
 
 
   def clearLeds(self):
@@ -130,6 +129,7 @@ class Game:
       for i in range(len(players_leds[n])):
         if GPIO.input(players_leds[n][i]):
           GPIO.output(players_leds[n][i], GPIO.LOW)
+    # pass
 
   def run(self, queue):
     while True:
@@ -155,7 +155,6 @@ class Game:
 
       if self.gameActive:
         self.drawBackground()
-        # self.printScore()
         self.drawPlaySurface()
         self.drawWalls()
 
@@ -173,8 +172,8 @@ class Game:
           self.startGame()
         self.WINDOW.fill((121, 144, 147))
 
-        self.player1 = self.font.render(f'Player1 {self.readyCheck[0]}', True, (0, 0, 0))
-        self.player2 = self.font.render(f'Player2 {self.readyCheck[1]}', True, (0, 0, 0))
+        self.player1 = self.font.render(f'Player1 {self.readyToString(self.readyCheck[0])}', True, (0, 0, 0))
+        self.player2 = self.font.render(f'Player2 {self.readyToString(self.readyCheck[1])}', True, (0, 0, 0))
         self.startRect = self.player1.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
         self.startRect2 = self.player2.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 150))
         self.WINDOW.blit(self.player1, self.startRect)
@@ -189,12 +188,12 @@ class Game:
         if self.points[self.who_won-1] >= 3:
           self.mainGameActive = False
 
-        self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+        self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
         self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
 
         self.pointsTxt = self.font.render(f"{self.points[0]} : {self.points[1]}", True, (0, 0, 0))
-        self.pointsRect = self.pointsTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 200))
-        self.WINDOW.blit(self.pointsTxt, self.nameRect)
+        self.pointsRect = self.pointsTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+        self.WINDOW.blit(self.pointsTxt, self.pointsRect)
 
       else:
         if sum(self.readyCheck) is 2:
@@ -205,22 +204,23 @@ class Game:
         self.nameRect = self.nameTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 - 100))
         self.WINDOW.blit(self.nameTxt, self.nameRect)
 
-        self.player1 = self.font.render(f'Player1 {self.readyCheck[0]}', True, (0, 0, 0))
-        self.player2 = self.font.render(f'Player2 {self.readyCheck[1]}', True, (0, 0, 0))
+        self.player1 = self.font.render(f'Player1 {self.readyToString(self.readyCheck[0])}', True, (0, 0, 0))
+        self.player2 = self.font.render(f'Player2 {self.readyToString(self.readyCheck[1])}', True, (0, 0, 0))
         self.startRect = self.player1.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 100))
         self.startRect2 = self.player2.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2 + 150))
         self.WINDOW.blit(self.player1, self.startRect)
         self.WINDOW.blit(self.player2, self.startRect2)
 
-        if self.points[0] > self.points[1]:
-          self.overScoreTxt = self.font.render(f'Player 1 won the game!', True, (0, 0, 0))
-        elif self.points[0] < self.points[1]:
-          self.overScoreTxt = self.font.render(f'Player 2 won the game!', True, (0, 0, 0))
-        else:
-          self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
+        if self.who_won != Undefined:
+          if self.points[0] > self.points[1]:
+            self.overScoreTxt = self.font.render(f'Player 1 won the game!', True, (0, 0, 0))
+          elif self.points[0] < self.points[1]:
+            self.overScoreTxt = self.font.render(f'Player 2 won the game!', True, (0, 0, 0))
+          else:
+            self.overScoreTxt = self.font.render(f'Draw!', True, (0, 0, 0))
 
-        self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
-        self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
+          self.overScoreRect = self.overScoreTxt.get_rect(center = (self.WINTDOW_WIDTH/2, self.WINDOW_HEIGHT/2))
+          self.WINDOW.blit(self.overScoreTxt, self.overScoreRect)
 
         self.keys = pygame.key.get_pressed()
         if self.keys[pygame.K_RETURN]:

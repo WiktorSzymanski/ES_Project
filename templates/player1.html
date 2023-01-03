@@ -27,19 +27,21 @@
             <button id='up' class="controls">&#94;</button>
         </div>
         <div>
-            <button id='left' class="controls ext-offset">&lt;</button>
-
-            <button id='right' class="controls ext-offset">&gt;</button>
+            <button id='left' class="controls">&lt;</button>
+            <button id='sup1' class="controls">ghost</button>
+            <button id='right' class="controls">&gt;</button>
         </div>
         <div>
             <button id='down' class="controls">v</button>
         </div>
 
         <div>
-            <button id='sup1' class="controls">Ghost</button>
-            <button id='start' class="controls">start</button>
+            <button id='start' class="controls">ready</button>
         </div>
-        <a href="/">Wróć</a>
+        <br>
+        <br>
+        <a href="/">back</a>
+        <br>
     </div>
    <script>
         var up = document.getElementById("up")
@@ -58,7 +60,7 @@
 
 
         function SendEvent(event){
-            fetch("http://192.168.1.34:5001/player1", {
+            fetch("http://localhost:5001/player1", {
                 method: "POST",
                 headers: {"Content-Type": "text/html"},
                 body: event
