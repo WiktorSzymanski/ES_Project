@@ -12,4 +12,4 @@ try:
     GPIO.output(26, GPIO.LOW)
     time.sleep(10)
 except KeyboardInterrupt:
-  GPIO.clenup()
+  GPIO.cleanup()
