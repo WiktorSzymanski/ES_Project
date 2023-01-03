@@ -1,6 +1,6 @@
 import RPi.GPIO as GPIO
 
-GPIO.sermode(GPIO.BOARD)
+GPIO.setmode(GPIO.BOARD)
 GPIO.setup(26, GPIO.OUT, initial=GPIO.LOW)
 
 while True:
