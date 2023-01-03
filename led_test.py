@@ -10,6 +10,6 @@ try:
     GPIO.output(26, GPIO.HIGH)
     time.sleep(10)
     GPIO.output(26, GPIO.LOW)
-    time.sleep(10)
+    time.sleep(1)
 except KeyboardInterrupt:
   GPIO.cleanup()
