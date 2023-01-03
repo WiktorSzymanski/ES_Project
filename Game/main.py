@@ -121,7 +121,6 @@ class Game:
       for i in range(self.points[n]):
         if not GPIO.input(players_leds[n][i]):
           GPIO.output(players_leds[n][i], GPIO.HIGH)
-    # pass
 
 
   def clearLeds(self):
@@ -129,7 +128,6 @@ class Game:
       for i in range(len(players_leds[n])):
         if GPIO.input(players_leds[n][i]):
           GPIO.output(players_leds[n][i], GPIO.LOW)
-    # pass
 
   def run(self, queue):
     while True:
